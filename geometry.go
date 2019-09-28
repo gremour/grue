@@ -34,6 +34,16 @@ func (r Rect) Size() Vec {
 	}
 }
 
+// W calculates the width of the rectangle
+func (r Rect) W() float64 {
+	return r.Max.X - r.Min.X
+}
+
+// H calculates the height of the rectangle
+func (r Rect) H() float64 {
+	return r.Max.Y - r.Min.Y
+}
+
 // Expanded returns expanded rectangle by given distance in pixels.
 // If d is negative, rectangle is shrunk instead.
 func (r Rect) Expanded(d float64) Rect {

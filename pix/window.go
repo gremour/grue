@@ -6,6 +6,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 	"github.com/gremour/grue"
 )
 
@@ -17,6 +18,8 @@ type Window struct {
 	frameTime float64
 	totalTime float64
 	fps       int
+
+	fonts map[string]*text.Atlas
 }
 
 // Run the main loop.

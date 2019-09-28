@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"io/ioutil"
+	"os"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
+	"golang.org/x/image/font"
+	"github.com/golang/freetype/truetype"
 	"github.com/gremour/grue"
 )
 
@@ -42,6 +47,7 @@ func NewPrimarySurface(wcfg grue.WindowConfig, scfg grue.SurfaceConfig) (*Surfac
 	window := &Window{
 		Window: win,
 		fps:    wcfg.FPS,
+		fonts:  make(map[string]*text.Atlas),
 	}
 	return createSurface(window, scfg), nil
 }
@@ -55,6 +61,7 @@ func NewPrimarySurfaceWin(win *pixelgl.Window, scfg grue.SurfaceConfig, fps int)
 	window := &Window{
 		Window: win,
 		fps:    fps,
+		fonts:  make(map[string]*text.Atlas),
 	}
 
 	return createSurface(window, scfg), nil
@@ -149,28 +156,31 @@ func (s *Surface) DrawText(r grue.Rect, col color.Color, font, msg string, alh, 
 	if len(msg) == 0 {
 		return
 	}
-	// atl := l.Gcon.GetAtlas(font)
-	// txt := text.New(pixel.ZV, atl)
-	// tsz := txt.BoundsOf(msg)
-	// tsz.Max.Y -= atl.LineHeight() / 2
-	// txt.Color = col
-	// delta := r.Min
-	// switch alh {
-	// case 0:
-	// 	delta.X += (r.W() - tsz.W()) / 2
-	// case 1:
-	// 	delta.X += r.W() - tsz.W()
-	// default:
-	// }
-	// switch alv {
-	// case 0:
-	// 	delta.Y += (r.H() - tsz.H()) / 2
-	// case 1:
-	// 	delta.Y += r.H() - tsz.H()
-	// default:
-	// }
-	// fmt.Fprintf(txt, msg)
-	// txt.Draw(l, pixel.IM.Moved(delta))
+	atl, ok := s.Window.fonts[font]
+	if !ok {
+ 		atl = text.Atlas7x13
+	}
+	txt := text.New(pixel.ZV, atl)
+	tsz := txt.BoundsOf(msg)
+	tsz.Max.Y -= atl.LineHeight() / 2
+	txt.Color = col
+	delta := r.Min
+	switch alh {
+	case 0:
+		delta.X += (r.W() - tsz.W()) / 2
+	case 1:
+		delta.X += r.W() - tsz.W()
+	default:
+	}
+	switch alv {
+	case 0:
+		delta.Y += (r.H() - tsz.H()) / 2
+	case 1:
+		delta.Y += r.H() - tsz.H()
+	default:
+	}
+	fmt.Fprintf(txt, msg)
+	txt.Draw(s.target(), pixel.IM.Moved(PVec(delta)))
 }
 
 func (s *Surface) updateMousePos(pos grue.Vec, click bool) {
@@ -216,4 +226,41 @@ func (s *Surface) JustReleased(button grue.Button) bool {
 // MouseScroll getter.
 func (s *Surface) MouseScroll() grue.Vec {
 	return GVec(s.Window.MouseScroll())
+}
+
+// InitTTF ...
+func (s *Surface) InitTTF(fontName, fileName string, size float64, charset grue.Charset) error {
+	face, err := LoadTTF(fileName, size)
+	if err != nil {
+		return err
+	}
+	atlas := text.NewAtlas(face, text.ASCII)
+	s.Window.fonts[fontName] = atlas
+	return nil
+}
+
+// LoadTTF loads a true type font
+func LoadTTF(path string, size float64) (font.Face, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	font, err := truetype.Parse(bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	face := truetype.NewFace(font, &truetype.Options{
+		Size:              size,
+		GlyphCacheEntries: 1,
+	})
+
+	return face, nil
 }

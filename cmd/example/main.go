@@ -1,6 +1,7 @@
 package main
-
 import (
+	"image/color"
+
 	"github.com/gremour/grue"
 	"github.com/gremour/grue/pix"
 )
@@ -25,13 +26,8 @@ func runUI() {
 		FPS:            60,
 	}
 
-	// Surface configuration options.
-	scfg := grue.SurfaceConfig{
-		PixelSize: 2,
-	}
-
 	// Create primary surface (this includes window).
-	s, err := pix.NewPrimarySurface(wcfg, scfg)
+	s, err := pix.NewPrimarySurface(wcfg, grue.SurfaceConfig{PixelSize: 2})
 	if err != nil {
 		panic(err)
 	}
@@ -40,6 +36,8 @@ func runUI() {
 	if err != nil {
 		panic(err)
 	}
+
+	s.InitTTF("default", "themes/caladea-bold.ttf", 12, grue.Charset{})
 
 	// Create toplevel panel.
 	pn := grue.NewPanel(s.Root(), grue.Base{
@@ -50,6 +48,8 @@ func runUI() {
 	bt1 := grue.NewPushButton(pn, grue.Base{
 		Rect:      grue.R0(80, 20),
 		BackColor: grue.RGB(0.7, 0.7, 0.7),
+		Text:      "Pushme",
+		ForeColor: color.Black,
 	})
 	bt1.Place(grue.V(50, 50))
 
@@ -57,6 +57,8 @@ func runUI() {
 	bt2 := grue.NewPushButton(s2.Root(), grue.Base{
 		Rect:      grue.R0(160, 40),
 		BackColor: grue.RGB(0.7, 0.8, 0.8),
+		Text:      "And me",
+		ForeColor: grue.RGB(0.5, 0.0, 0.0),
 	})
 	// And placed at different Y offset.
 	// But will appear at same height as bt1.
@@ -67,3 +69,4 @@ func runUI() {
 	// Run main loop.
 	s.Run()
 }
+
