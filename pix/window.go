@@ -19,7 +19,19 @@ type Window struct {
 	totalTime float64
 	fps       int
 
-	fonts map[string]*text.Atlas
+	fonts   map[string]*text.Atlas
+	sprites map[string]*pixel.Sprite
+
+	theme grue.Theme
+}
+
+func newWindow(win *pixelgl.Window, fps int) *Window {
+	return &Window{
+		Window:  win,
+		fps:     fps,
+		fonts:   make(map[string]*text.Atlas),
+		sprites: make(map[string]*pixel.Sprite),
+	}
 }
 
 // Run the main loop.

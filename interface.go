@@ -1,6 +1,7 @@
 package grue
 
 import (
+	"image"
 	"image/color"
 )
 
@@ -21,7 +22,19 @@ type Surface interface {
 	// Draw functions
 	DrawFillRect(r Rect, col color.Color)
 	DrawRect(r Rect, col color.Color, thick float64)
-	DrawText(r Rect, col color.Color, font, msg string, alh, alv int)
+
+	// Font is a font name that was previously initialized.
+	// alh, alv -- horizontal and vertical text alignment (see Aling type)
+	DrawText(msg, font string, r Rect, col color.Color, alh, alv Align)
+
+	// Draws image centered around pos.
+	DrawImage(name string, pos Vec, col color.Color)
+
+	// Draws image aligned relative to pos.
+	DrawImageAligned(name string, pos Vec, alh, alv Align, col color.Color)
+
+	// Draw image into target rectangle.
+	DrawImageStretched(name string, rect Rect, col color.Color)
 
 	// Mouse & keyboard
 	MousePos() Vec
@@ -33,6 +46,37 @@ type Surface interface {
 
 	// Load and init TTF font that will be known under given name
 	InitTTF(fontName, fileName string, size float64, charset Charset) error
+
+	// Load and init images from sheet described by JSON file
+	InitImages(configFileName string) error
+
+	// Get size of the previously loaded image
+	GetImageSize(name string) (Vec, error)
+
+	// Init images from sheet described by config structure.
+	// Images will be named as described in configuration.
+	// DrawImage can be used with corresponding image names.
+	// If JSON sheets configuration file exists,
+	// you may want to use InitImages method.
+	InitImageSheets(config ImageSheetConfig) error
+
+	SetTheme(theme Theme)
+	GetTheme() Theme
+}
+
+// Theme contains info for rendering widgets
+type Theme struct {
+	// Font name used for titles (panels, buttons, etc)
+	TitleFont string
+
+	// Drawers
+	DrawPanel  ThemeDrawer
+	DrawButton ThemeDrawer
+}
+
+// ThemeDrawer is interface to draw rectangular panels.
+type ThemeDrawer interface {
+	Draw(s Surface, rect Rect)
 }
 
 // Widget is an interface for widgets functionality.
@@ -51,4 +95,30 @@ type Widget interface {
 
 // Charset represents character set for use in fonts
 type Charset struct {
+	// TODO: implement charset.
+	// For now, ASCII is hardcoded.
+}
+
+// ImageSheetConfig contains configuration for sheets containing subimages (sprites).
+// OpenGL allows limited number of textures to be loaded into videocard memory.
+// Because of that, images are loaded as atlases -- a big texture containing
+// a lot of subimages. Sheet is a continous line of images of same width and height
+// within atlas. Atlas can hold multiple sheets.
+type ImageSheetConfig struct {
+	// Either atlas or file should be set.
+	// If atlas is nil, file is used as filename to load image.
+	Atlas image.Image
+	// File is the name of the image file to load.
+	File string `json:"file"`
+	// Sheets containing continuous line of uniform sized subimages.
+	Sheets []SheetConfig `json:"sheets"`
+}
+
+// SheetConfig is configuration for oine sheet
+type SheetConfig struct {
+	XOffset float64  `json:"x_offset"`
+	YOffset float64  `json:"y_offset"`
+	W       float64  `json:"width"`
+	H       float64  `json:"height"`
+	Names   []string `json:"names"`
 }

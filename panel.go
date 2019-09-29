@@ -177,7 +177,7 @@ func (w *Panel) paint() {
 		//	} else
 		// TODO: align image and text
 		if len(w.Text) > 0 {
-			w.Surface.DrawText(r, w.ForeColor, "default", w.Text, 0, 0)
+			w.Surface.DrawText(w.Text, "default", r, w.ForeColor, AlignCenter, AlignCenter)
 		}
 	}
 	if w.OnDraw != nil {

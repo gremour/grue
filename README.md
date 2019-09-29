@@ -7,7 +7,7 @@ after basic functionality is implemented (v0.1.0+).
 
 Basic functionality TODO:
 
-- Fonts;
-- Layout helper;
 - Panel and pushbutton displaying image and/or text;
-- Themes and bitmap background for pushbuttons and panels.
+- Themes and bitmap background for pushbuttons and panels (partially done);
+- Pixel precise drawing (flooring float values);
+- Layout helper;

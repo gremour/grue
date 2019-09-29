@@ -1,9 +1,11 @@
 package main
+
 import (
 	"image/color"
 
 	"github.com/gremour/grue"
 	"github.com/gremour/grue/pix"
+	"github.com/gremour/grue/themes"
 )
 
 func main() {
@@ -27,7 +29,53 @@ func runUI() {
 	}
 
 	// Create primary surface (this includes window).
-	s, err := pix.NewPrimarySurface(wcfg, grue.SurfaceConfig{PixelSize: 2})
+	s, err := pix.NewPrimarySurface(wcfg, grue.SurfaceConfig{PixelSize: 1})
+	if err != nil {
+		panic(err)
+	}
+
+	theme, err := themes.NewLight(s, "assets/caladea-bold.ttf", 20, "assets/theme-light.json")
+	if err != nil {
+		panic(err)
+	}
+
+	// err = s.InitImages("assets/test.json")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// Create toplevel panel.
+	pn := grue.NewPanel(s.Root(), grue.Base{
+		Rect:      grue.R(20, 20, 480, 280),
+		BackColor: grue.RGB(0.2, 0.7, 1.0),
+	})
+
+	bt1 := grue.NewPushButton(pn, grue.Base{
+		Rect:      grue.R0(120, 40),
+		BackColor: grue.RGB(0.7, 0.7, 0.7),
+		Text:      "Hello",
+		ForeColor: color.Black,
+	})
+	bt1.Place(grue.V(50, 50))
+
+	s.SetEvents(func() {
+		theme.DrawButton.Draw(s, grue.R(100, 400, 300, 500))
+	})
+
+	// Run main loop.
+	s.Run()
+}
+
+func runUI2() {
+	// Window configuration options.
+	wcfg := grue.WindowConfig{
+		Title:          "Grue example",
+		WindowGeometry: grue.R(0, 0, 1000, 600),
+		FPS:            60,
+	}
+
+	// Create primary surface (this includes window).
+	s, err := pix.NewPrimarySurface(wcfg, grue.SurfaceConfig{PixelSize: 1})
 	if err != nil {
 		panic(err)
 	}
@@ -69,4 +117,3 @@ func runUI() {
 	// Run main loop.
 	s.Run()
 }
-

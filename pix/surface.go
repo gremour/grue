@@ -2,17 +2,15 @@ package pix
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"math"
-	"io/ioutil"
 	"os"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"golang.org/x/image/font"
-	"github.com/golang/freetype/truetype"
 	"github.com/gremour/grue"
 )
 
@@ -44,11 +42,7 @@ func NewPrimarySurface(wcfg grue.WindowConfig, scfg grue.SurfaceConfig) (*Surfac
 		return nil, err
 	}
 
-	window := &Window{
-		Window: win,
-		fps:    wcfg.FPS,
-		fonts:  make(map[string]*text.Atlas),
-	}
+	window := newWindow(win, wcfg.FPS)
 	return createSurface(window, scfg), nil
 }
 
@@ -58,12 +52,7 @@ func NewPrimarySurfaceWin(win *pixelgl.Window, scfg grue.SurfaceConfig, fps int)
 		return nil, fmt.Errorf("Requires non-nil window")
 	}
 
-	window := &Window{
-		Window: win,
-		fps:    fps,
-		fonts:  make(map[string]*text.Atlas),
-	}
-
+	window := newWindow(win, fps)
 	return createSurface(window, scfg), nil
 }
 
@@ -152,35 +141,61 @@ func (s *Surface) DrawRect(r grue.Rect, col color.Color, thick float64) {
 }
 
 // DrawText draws text with given color, font and alignment.
-func (s *Surface) DrawText(r grue.Rect, col color.Color, font, msg string, alh, alv int) {
+func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, alh, alv grue.Align) {
 	if len(msg) == 0 {
 		return
 	}
 	atl, ok := s.Window.fonts[font]
 	if !ok {
- 		atl = text.Atlas7x13
+		atl = text.Atlas7x13
 	}
 	txt := text.New(pixel.ZV, atl)
 	tsz := txt.BoundsOf(msg)
 	tsz.Max.Y -= atl.LineHeight() / 2
 	txt.Color = col
-	delta := r.Min
-	switch alh {
-	case 0:
-		delta.X += (r.W() - tsz.W()) / 2
-	case 1:
-		delta.X += r.W() - tsz.W()
-	default:
-	}
-	switch alv {
-	case 0:
-		delta.Y += (r.H() - tsz.H()) / 2
-	case 1:
-		delta.Y += r.H() - tsz.H()
-	default:
-	}
 	fmt.Fprintf(txt, msg)
-	txt.Draw(s.target(), pixel.IM.Moved(PVec(delta)))
+	pos := GRect(tsz).AlignToRect(r, alh, alv)
+	pos = pos.Sub(grue.V(tsz.W()/2, tsz.H()/2))
+	txt.Draw(s.target(), pixel.IM.Moved(PVec(pos)))
+}
+
+// DrawImage ...
+func (s *Surface) DrawImage(name string, pos grue.Vec, col color.Color) {
+	im, err := s.GetImage(name)
+	if err != nil {
+		return
+	}
+	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
+}
+
+// DrawImageStretched ...
+func (s *Surface) DrawImageStretched(name string, rect grue.Rect, col color.Color) {
+	im, err := s.GetImage(name)
+	if err != nil {
+		return
+	}
+	imsz, _ := s.GetImageSize(name)
+	if imsz.X == 0 ||
+		imsz.Y == 0 {
+		return
+	}
+	rctr := PVec(rect.Center())
+	scv := pixel.V(rect.W()/imsz.X, rect.H()/imsz.Y)
+	im.DrawColorMask(s.target(), pixel.IM.Moved(rctr).ScaledXY(rctr, scv), col)
+}
+
+// DrawImageAligned ...
+func (s *Surface) DrawImageAligned(name string, pos grue.Vec, alh, alv grue.Align, col color.Color) {
+	im, err := s.GetImage(name)
+	if err != nil {
+		return
+	}
+	imsz, err := s.GetImageSize(name)
+	if err != nil {
+		return
+	}
+	pos = grue.Rect{Max: imsz}.AlignToPoint(pos, alh, alv)
+	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
 }
 
 func (s *Surface) updateMousePos(pos grue.Vec, click bool) {
@@ -230,7 +245,7 @@ func (s *Surface) MouseScroll() grue.Vec {
 
 // InitTTF ...
 func (s *Surface) InitTTF(fontName, fileName string, size float64, charset grue.Charset) error {
-	face, err := LoadTTF(fileName, size)
+	face, err := grue.LoadTTF(fileName, size)
 	if err != nil {
 		return err
 	}
@@ -239,28 +254,91 @@ func (s *Surface) InitTTF(fontName, fileName string, size float64, charset grue.
 	return nil
 }
 
-// LoadTTF loads a true type font
-func LoadTTF(path string, size float64) (font.Face, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
+// InitImageSheets ...
+func (s *Surface) InitImageSheets(config grue.ImageSheetConfig) error {
+	if config.Atlas == nil {
+		imageFile, err := os.Open(config.File)
+		if err != nil {
+			return err
+		}
+		defer imageFile.Close()
+
+		config.Atlas, _, err = image.Decode(imageFile)
+		if err != nil {
+			return err
+		}
 	}
-	defer file.Close()
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
+	pic := pixel.PictureDataFromImage(config.Atlas)
+	b := pic.Bounds()
+	for _, sh := range config.Sheets {
+		pos := b.Min
+		pos.X += sh.XOffset
+		pos.Y += sh.YOffset
+		size := pixel.V(sh.W, sh.H)
+		if pos.X+size.X > b.Max.X ||
+			pos.Y+size.Y > b.Max.Y {
+			return fmt.Errorf("offest exceeds image size: offset=%v,%v, image size=%v,%v",
+				sh.XOffset, sh.YOffset, b.Max.X, b.Max.Y)
+		}
+		for _, n := range sh.Names {
+			if len(n) > 0 {
+				r := pixel.R(
+					pos.X,
+					b.Max.Y-pos.Y-size.Y,
+					pos.X+size.X,
+					b.Max.Y-pos.Y)
+				s.Window.sprites[n] = pixel.NewSprite(pic, r)
+				pos.X += size.X
+			}
+			if len(n) == 0 || pos.X+size.X > b.Max.X {
+				pos.X = b.Min.X
+				pos.Y += size.Y
+			}
+			if pos.Y+size.Y > b.Max.Y {
+				break
+			}
+		}
 	}
+	return nil
+}
 
-	font, err := truetype.Parse(bytes)
+// InitImages ...
+func (s *Surface) InitImages(configFileName string) error {
+	sheets, err := grue.LoadImages(configFileName)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	err = s.InitImageSheets(sheets)
+	if err != nil {
+		return err
+	}
+	return err
+}
 
-	face := truetype.NewFace(font, &truetype.Options{
-		Size:              size,
-		GlyphCacheEntries: 1,
-	})
+// GetImageSize ...
+func (s *Surface) GetImageSize(name string) (grue.Vec, error) {
+	im, err := s.GetImage(name)
+	if err != nil {
+		return grue.Vec{}, err
+	}
+	return GRect(im.Frame()).Size(), nil
+}
 
-	return face, nil
+// GetImage ...
+func (s *Surface) GetImage(name string) (*pixel.Sprite, error) {
+	spr, ok := s.Window.sprites[name]
+	if !ok {
+		return nil, fmt.Errorf(`image "%v" not found`, name)
+	}
+	return spr, nil
+}
+
+// SetTheme ...
+func (s *Surface) SetTheme(theme grue.Theme) {
+	s.Window.theme = theme
+}
+
+// GetTheme ...
+func (s *Surface) GetTheme() grue.Theme {
+	return s.Window.theme
 }

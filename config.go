@@ -11,4 +11,5 @@ type WindowConfig struct {
 // SurfaceConfig contains configuration for surface.
 type SurfaceConfig struct {
 	PixelSize float64
+	// PixelPrecise bool -- make all drawing converted to integer coordinates
 }

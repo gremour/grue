@@ -16,9 +16,22 @@ func (v Vec) Add(u Vec) Vec {
 	return Vec{v.X + u.X, v.Y + u.Y}
 }
 
+// Sub return result of subtraction of u from v
+func (v Vec) Sub(u Vec) Vec {
+	return Vec{v.X - u.X, v.Y - u.Y}
+}
+
 // Len returns the length of the vector v.
 func (v Vec) Len() float64 {
 	return math.Hypot(v.X, v.Y)
+}
+
+// Half of the rectangle
+func (v Vec) Half() Vec {
+	return Vec{
+		X: v.X / 2,
+		Y: v.X / 2,
+	}
 }
 
 // Rect describes rectangular area on surface.
@@ -31,6 +44,14 @@ func (r Rect) Size() Vec {
 	return Vec{
 		X: r.Max.X - r.Min.X,
 		Y: r.Max.Y - r.Min.Y,
+	}
+}
+
+// Center of the rectangle
+func (r Rect) Center() Vec {
+	return Vec{
+		X: (r.Max.X + r.Min.X) / 2,
+		Y: (r.Max.Y + r.Min.Y) / 2,
 	}
 }
 
@@ -83,4 +104,51 @@ func R(x1, y1, x2, y2 float64) Rect {
 // R0 creates rect with Min in (0, 0).
 func R0(w, h float64) Rect {
 	return Rect{Max: V(w, h)}
+}
+
+// Align defines object alignment relative to parent
+type Align int
+
+const (
+	// AlignCenter ...
+	AlignCenter Align = 0
+	// AlignLeft ...
+	AlignLeft Align = -1
+	// AlignRight ...
+	AlignRight Align = 1
+	// AlignTop ...
+	AlignTop Align = 1
+	// AlignBottom ...
+	AlignBottom Align = -1
+)
+
+// AlignToRect returns a Vec that src Rect have to be
+// moved by in order to align relative to dst Rect given
+// alignments alh, alv.
+func (r Rect) AlignToRect(dst Rect, alh, alv Align) Vec {
+	delta := dst.Center()
+	switch alh {
+	case AlignCenter:
+	case AlignRight:
+		delta.X += (dst.W() - r.W()) / 2
+	case AlignLeft:
+		delta.X -= (dst.W() - r.W()) / 2
+	default:
+	}
+	switch alv {
+	case AlignCenter:
+	case AlignTop:
+		delta.Y += (dst.H() - r.H()) / 2
+	case AlignBottom:
+		delta.Y -= (dst.H() - r.H()) / 2
+	default:
+	}
+	return delta
+}
+
+// AlignToPoint returns a Vec that src Rect have to be
+// moved by in order to align relative to dst Point given
+// alignments alh, alv.
+func (r Rect) AlignToPoint(dst Vec, alh, alv Align) Vec {
+	return r.AlignToRect(Rect{dst, dst}, alh, alv)
 }
