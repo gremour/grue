@@ -10,13 +10,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="39.388622mm"
-   height="13.196207mm"
-   viewBox="0 0 39.388622 13.196207"
+   width="6.5mm"
+   height="12.5mm"
+   viewBox="0 0 6.5 12.5"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="button.svg">
+   sodipodi:docname="button1.svg">
   <defs
      id="defs2">
     <linearGradient
@@ -27,7 +27,7 @@
          offset="0"
          id="stop817" />
       <stop
-         style="stop-color:#e6e6e6;stop-opacity:1"
+         style="stop-color:#dcdcdc;stop-opacity:1"
          offset="1"
          id="stop819" />
     </linearGradient>
@@ -40,7 +40,8 @@
        x2="75.035927"
        y2="44.096207"
        gradientUnits="userSpaceOnUse"
-       spreadMethod="reflect" />
+       spreadMethod="reflect"
+       gradientTransform="translate(-1.4304688e-6)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -49,9 +50,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="56.651212"
-     inkscape:cy="8.6618332"
+     inkscape:zoom="4"
+     inkscape:cx="85.542121"
+     inkscape:cy="20.199577"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -80,15 +81,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-55.274791,-31.284087)">
+     transform="translate(-55.074791,-31.084087)">
     <rect
        id="rect10"
-       width="39.288624"
-       height="13.096207"
+       width="6"
+       height="12"
        x="55.324791"
        y="31.334087"
-       rx="2.0000012"
-       ry="2.0000012"
-       style="opacity:0.97000002;fill:url(#linearGradient823);fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" />
+       style="opacity:0.97000002;fill:url(#linearGradient823);fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       rx="1"
+       ry="1" />
   </g>
 </svg>

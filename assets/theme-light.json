@@ -11,12 +11,12 @@
         {
             "x_offset": 4,
             "y_offset": 0,
-            "width": 62,
+            "width": 4,
             "height": 4,
             "names": ["light-bt-t"]
         },
         {
-            "x_offset": 66,
+            "x_offset": 8,
             "y_offset": 0,
             "width": 4,
             "height": 4,
@@ -32,12 +32,12 @@
         {
             "x_offset": 4,
             "y_offset": 4,
-            "width": 62,
+            "width": 4,
             "height": 16,
             "names": ["light-bt-c"]
         },
         {
-            "x_offset": 66,
+            "x_offset": 8,
             "y_offset": 4,
             "width": 4,
             "height": 16,
@@ -53,16 +53,79 @@
         {
             "x_offset": 4,
             "y_offset": 20,
-            "width": 62,
+            "width": 4,
             "height": 4,
             "names": ["light-bt-b"]
         },
         {
-            "x_offset": 66,
+            "x_offset": 8,
             "y_offset": 20,
             "width": 4,
             "height": 4,
             "names": ["light-bt-br"]
+        },
+        {
+            "x_offset": 12,
+            "y_offset": 0,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-tl"]
+        },
+        {
+            "x_offset": 16,
+            "y_offset": 0,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-t"]
+        },
+        {
+            "x_offset": 20,
+            "y_offset": 0,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-tr"]
+        },
+        {
+            "x_offset": 12,
+            "y_offset": 4,
+            "width": 4,
+            "height": 16,
+            "names": ["light-bt-act-l"]
+        },
+        {
+            "x_offset": 16,
+            "y_offset": 4,
+            "width": 4,
+            "height": 16,
+            "names": ["light-bt-act-c"]
+        },
+        {
+            "x_offset": 20,
+            "y_offset": 4,
+            "width": 4,
+            "height": 16,
+            "names": ["light-bt-act-r"]
+        },
+        {
+            "x_offset": 12,
+            "y_offset": 20,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-bl"]
+        },
+        {
+            "x_offset": 16,
+            "y_offset": 20,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-b"]
+        },
+        {
+            "x_offset": 20,
+            "y_offset": 20,
+            "width": 4,
+            "height": 4,
+            "names": ["light-bt-act-br"]
         }
     ]
 }

@@ -60,14 +60,19 @@ func (w *Window) Run() {
 
 		// w.ShowTooltip()
 
-		for _, s := range w.surfaces {
+		for i, s := range w.surfaces {
+			if i == 0 && s.Config.BackColor != nil && s.Canvas == nil {
+				w.Clear(s.Config.BackColor)
+			}
 			if s.Canvas != nil {
 				if s.Config.PixelSize == 1 {
 					s.Canvas.Draw(w, pixel.IM.Moved(w.Bounds().Center()))
 				} else {
 					s.Canvas.Draw(w, pixel.IM.Scaled(pixel.ZV, s.Config.PixelSize).Moved(w.Bounds().Center()))
 				}
-				s.Canvas.Clear(grue.RGBA(0.15, 0.15, 0.15, 0))
+				if s.Config.BackColor != nil {
+					s.Canvas.Clear(s.Config.BackColor)
+				}
 			}
 		}
 		w.Update()

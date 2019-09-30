@@ -1,56 +1,16 @@
 package grue
 
-import (
-	"image/color"
-)
-
 // Base is collection of initializable fields for widget.
 type Base struct {
-	Rect      Rect
-	BackColor color.Color
-	ForeColor color.Color
-	Text      string
-	//	Image       Image
-	ImageScale  float64
-	Tooltip     string
-	Border      float64
-	BorderColor color.Color
-	BorderInset float64
+	Theme    *Theme
+	Rect     Rect
+	Text     string
+	Tooltip  string
+	Disabled bool
 
 	// If true, widget is invisible (but children are).
 	// OnDraw is still called and can paint.
 	Phantom bool
-}
-
-// DefaultPanel is default Base for panel.
-var DefaultPanel = Base{
-	BackColor:   RGBA(0, 0, 0, 0.4),
-	ForeColor:   RGB(1, 0.8, 0.5),
-	BorderColor: RGB(0.5, 0.45, 0.3),
-	Border:      0,
-	ImageScale:  1,
-}
-
-func initDefaultBase(b, def Base) Base {
-	if b.BackColor == nil {
-		b.BackColor = def.BackColor
-	}
-	if b.ForeColor == nil {
-		b.ForeColor = def.ForeColor
-	}
-	if b.BorderColor == nil {
-		b.BorderColor = def.BorderColor
-	}
-	if b.Border == 0 {
-		b.Border = def.Border
-	}
-	if b.BorderInset == 0 {
-		b.BorderInset = def.BorderInset
-	}
-	if b.ImageScale == 0 {
-		b.ImageScale = def.ImageScale
-	}
-	return b
 }
 
 // Panel is simple widget with background color and border.
@@ -96,7 +56,7 @@ type Interactive struct {
 func NewPanel(parent Node, b Base) *Panel {
 	w := &Panel{
 		node: &node{},
-		Base: initDefaultBase(b, DefaultPanel),
+		Base: b,
 	}
 	initWidget(parent, w)
 	return w
@@ -168,16 +128,26 @@ func (w *Panel) SubWidgets() []Widget {
 func (w *Panel) paint() {
 	if !w.Phantom {
 		r := w.GlobalRect()
-		if _, _, _, a := w.BackColor.RGBA(); a > 0 {
-			w.Surface.DrawFillRect(r, w.BackColor)
+		theme := w.Theme
+		if theme == nil {
+			theme = w.Surface.GetTheme()
 		}
-		w.Surface.DrawRect(r.Expanded(-w.BorderInset), w.BorderColor, w.Border)
-		// if w.Image != nil {
-		// 	w.Image.Draw(w.Glayer, r.Center(), w.ImageScale)
-		//	} else
-		// TODO: align image and text
+		tdef, _ := theme.Drawers[ThemePanel]
+		var tcur ThemeDrawer
+		tcol := theme.TextColor
+		switch {
+		case w.Disabled:
+			tcur, _ = theme.Drawers[ThemePanelDisabled]
+			tcol = theme.DisabledTextColor
+		}
+		if tcur != nil {
+			tdef = tcur
+		}
+		if tdef != nil {
+			tdef.Draw(w.Surface, r)
+		}
 		if len(w.Text) > 0 {
-			w.Surface.DrawText(w.Text, "default", r, w.ForeColor, AlignCenter, AlignCenter)
+			w.Surface.DrawText(w.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
 		}
 	}
 	if w.OnDraw != nil {

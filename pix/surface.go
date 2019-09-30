@@ -339,6 +339,6 @@ func (s *Surface) SetTheme(theme grue.Theme) {
 }
 
 // GetTheme ...
-func (s *Surface) GetTheme() grue.Theme {
-	return s.Window.theme
+func (s *Surface) GetTheme() *grue.Theme {
+	return &s.Window.theme
 }

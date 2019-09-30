@@ -1,9 +1,34 @@
-package themes
+package grue
 
-import (
-	"image/color"
+import "image/color"
 
-	"github.com/gremour/grue"
+// Theme contains info for rendering widgets
+type Theme struct {
+	// Font name used for titles (panels, buttons, etc)
+	TitleFont         string
+	TextColor         color.Color
+	DisabledTextColor color.Color
+
+	// Drawers
+	Drawers map[ThemeDrawerKey]ThemeDrawer
+}
+
+// ThemeDrawer is interface to draw rectangular panels.
+type ThemeDrawer interface {
+	Draw(s Surface, rect Rect)
+}
+
+// ThemeDrawerKey is used to select appropriate drawer
+// based on widget and it's flags
+type ThemeDrawerKey string
+
+const (
+	ThemePanel          ThemeDrawerKey = "p"
+	ThemePanelDisabled  ThemeDrawerKey = "p-d"
+	ThemeButton         ThemeDrawerKey = "b"
+	ThemeButtonDisabled ThemeDrawerKey = "b-d"
+	ThemeButtonHL       ThemeDrawerKey = "b-h"
+	ThemeButtonActive   ThemeDrawerKey = "b-a"
 )
 
 // TexturedPanel contains info needed to draw texturized
@@ -26,7 +51,7 @@ type TexturedPanel struct {
 }
 
 // Draw ...
-func (tp TexturedPanel) Draw(s grue.Surface, rect grue.Rect) {
+func (tp TexturedPanel) Draw(s Surface, rect Rect) {
 	imls, _ := s.GetImageSize(tp.ImagePrefix + "-l")
 	imrs, _ := s.GetImageSize(tp.ImagePrefix + "-r")
 	imts, _ := s.GetImageSize(tp.ImagePrefix + "-t")
@@ -34,36 +59,36 @@ func (tp TexturedPanel) Draw(s grue.Surface, rect grue.Rect) {
 
 	// TODO: tile options
 	s.DrawImageStretched(tp.ImagePrefix+"-c",
-		grue.R(rect.Min.X+imls.X, rect.Min.Y+imbs.Y, rect.Max.X-imrs.X, rect.Max.Y-imts.Y),
+		R(rect.Min.X+imls.X, rect.Min.Y+imbs.Y, rect.Max.X-imrs.X, rect.Max.Y-imts.Y),
 		tp.Color)
 	s.DrawImageStretched(tp.ImagePrefix+"-l",
-		grue.R(rect.Min.X, rect.Min.Y+imbs.Y, rect.Min.X+imls.X, rect.Max.Y-imts.Y),
+		R(rect.Min.X, rect.Min.Y+imbs.Y, rect.Min.X+imls.X, rect.Max.Y-imts.Y),
 		tp.Color)
 	s.DrawImageStretched(tp.ImagePrefix+"-r",
-		grue.R(rect.Max.X-imrs.X, rect.Min.Y+imbs.Y, rect.Max.X, rect.Max.Y-imts.Y),
+		R(rect.Max.X-imrs.X, rect.Min.Y+imbs.Y, rect.Max.X, rect.Max.Y-imts.Y),
 		tp.Color)
 	s.DrawImageStretched(tp.ImagePrefix+"-b",
-		grue.R(rect.Min.X+imls.X, rect.Min.Y, rect.Max.X-imrs.X, rect.Min.Y+imbs.Y),
+		R(rect.Min.X+imls.X, rect.Min.Y, rect.Max.X-imrs.X, rect.Min.Y+imbs.Y),
 		tp.Color)
 	s.DrawImageStretched(tp.ImagePrefix+"-t",
-		grue.R(rect.Min.X+imls.X, rect.Max.Y-imts.Y, rect.Max.X-imrs.X, rect.Max.Y),
+		R(rect.Min.X+imls.X, rect.Max.Y-imts.Y, rect.Max.X-imrs.X, rect.Max.Y),
 		tp.Color)
 
 	s.DrawImageAligned(tp.ImagePrefix+"-tl",
-		grue.V(rect.Min.X, rect.Max.Y),
-		grue.AlignLeft, grue.AlignTop,
+		V(rect.Min.X, rect.Max.Y),
+		AlignLeft, AlignTop,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-tr",
-		grue.V(rect.Max.X, rect.Max.Y),
-		grue.AlignRight, grue.AlignTop,
+		V(rect.Max.X, rect.Max.Y),
+		AlignRight, AlignTop,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-bl",
-		grue.V(rect.Min.X, rect.Min.Y),
-		grue.AlignLeft, grue.AlignBottom,
+		V(rect.Min.X, rect.Min.Y),
+		AlignLeft, AlignBottom,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-br",
-		grue.V(rect.Max.X, rect.Min.Y),
-		grue.AlignRight, grue.AlignBottom,
+		V(rect.Max.X, rect.Min.Y),
+		AlignRight, AlignBottom,
 		tp.Color)
 }
 
@@ -76,7 +101,7 @@ type PlainRect struct {
 }
 
 // Draw ...
-func (pr PlainRect) Draw(s grue.Surface, rect grue.Rect) {
+func (pr PlainRect) Draw(s Surface, rect Rect) {
 	if pr.BackColor != nil {
 		s.DrawFillRect(rect, pr.BackColor)
 	}

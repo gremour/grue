@@ -3,44 +3,37 @@ package grue
 // PushButton is pressable and optionally, checkable (TODO), button.
 type PushButton struct {
 	*Panel
-	hilited bool
-	pressed bool
+	Hilited bool
+	Pressed bool
 
 	OnPress func()
-}
-
-// DefaultPushButton is default Base for pushbutton.
-var DefaultPushButton = Base{
-	BackColor:   RGB(0.7, 0.7, 0.7),
-	Border:      1,
-	BorderInset: 2,
 }
 
 // NewPushButton creates new button.
 func NewPushButton(parent Node, b Base) *PushButton {
 	w := &PushButton{
-		Panel: NewPanel(nil, initDefaultBase(b, DefaultPushButton)),
+		Panel: NewPanel(nil, b),
 	}
 	initWidget(parent, w)
 
 	w.OnMouseIn = func() {
-		w.hilited = true
+		w.Hilited = true
 	}
 	w.OnMouseOut = func() {
-		w.hilited = false
-		w.pressed = false
+		w.Hilited = false
+		w.Pressed = false
 	}
 	w.OnMouseDown = func(bt Button) {
 		if bt != MouseButtonLeft {
 			return
 		}
-		w.pressed = true
+		w.Pressed = true
 	}
 	w.OnMouseUp = func(bt Button) {
 		if bt != MouseButtonLeft {
 			return
 		}
-		w.pressed = false
+		w.Pressed = false
 		if w.OnPress != nil {
 			w.OnPress()
 		}
@@ -50,15 +43,30 @@ func NewPushButton(parent Node, b Base) *PushButton {
 
 // Paint draws the widget without children.
 func (w *PushButton) paint() {
-	bc := w.BackColor
-	if w.hilited {
-		w.BackColor = RGB(0.6, 1, 1)
+	r := w.GlobalRect()
+	theme := w.Theme
+	if theme == nil {
+		theme = w.Surface.GetTheme()
 	}
-	bw := w.Border
-	if w.pressed {
-		w.Border = bw * 2
+	tdef, _ := theme.Drawers[ThemeButton]
+	var tcur ThemeDrawer
+	tcol := theme.TextColor
+	switch {
+	case w.Disabled:
+		tcur, _ = theme.Drawers[ThemeButtonDisabled]
+		tcol = theme.DisabledTextColor
+	case w.Pressed:
+		tcur, _ = theme.Drawers[ThemeButtonActive]
+	case w.Hilited:
+		tcur, _ = theme.Drawers[ThemeButtonHL]
 	}
-	w.Panel.paint()
-	w.Border = bw
-	w.BackColor = bc
+	if tcur != nil {
+		tdef = tcur
+	}
+	if tdef != nil {
+		tdef.Draw(w.Surface, r)
+	}
+	if len(w.Text) > 0 {
+		w.Surface.DrawText(w.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
+	}
 }

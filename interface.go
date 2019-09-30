@@ -61,22 +61,7 @@ type Surface interface {
 	InitImageSheets(config ImageSheetConfig) error
 
 	SetTheme(theme Theme)
-	GetTheme() Theme
-}
-
-// Theme contains info for rendering widgets
-type Theme struct {
-	// Font name used for titles (panels, buttons, etc)
-	TitleFont string
-
-	// Drawers
-	DrawPanel  ThemeDrawer
-	DrawButton ThemeDrawer
-}
-
-// ThemeDrawer is interface to draw rectangular panels.
-type ThemeDrawer interface {
-	Draw(s Surface, rect Rect)
+	GetTheme() *Theme
 }
 
 // Widget is an interface for widgets functionality.
