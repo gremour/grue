@@ -8,6 +8,12 @@ to be reasonably abstract from implementation.
 This is still work in progress. Expect proper examples and tutorial
 after basic functionality is implemented (v0.1.0+).
 
+## Running example
+
+```bash
+go run ./cmd/example
+```
+
 ## Basic functionality TODO
 
 - Panel and pushbutton displaying aligned image and/or text;
