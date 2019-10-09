@@ -27,6 +27,8 @@ type Surface interface {
 	// alh, alv -- horizontal and vertical text alignment (see Aling type)
 	DrawText(msg, font string, r Rect, col color.Color, alh, alv Align)
 
+	GetTextRect(msg, font string) Rect
+
 	// Draws image centered around pos.
 	DrawImage(name string, pos Vec, col color.Color)
 

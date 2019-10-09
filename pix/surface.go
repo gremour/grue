@@ -159,6 +159,21 @@ func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, alh, 
 	txt.Draw(s.target(), pixel.IM.Moved(PVec(pos)))
 }
 
+// GetTextRect ...
+func (s *Surface) GetTextRect(msg, font string) grue.Rect {
+	if len(msg) == 0 {
+		return grue.Rect{}
+	}
+	atl, ok := s.Window.fonts[font]
+	if !ok {
+		atl = text.Atlas7x13
+	}
+	txt := text.New(pixel.ZV, atl)
+	tsz := txt.BoundsOf(msg)
+	//tsz.Max.Y -= atl.LineHeight() / 2
+	return GRect(tsz)
+}
+
 // DrawImage ...
 func (s *Surface) DrawImage(name string, pos grue.Vec, col color.Color) {
 	im, err := s.GetImage(name)
@@ -196,6 +211,22 @@ func (s *Surface) DrawImageAligned(name string, pos grue.Vec, alh, alv grue.Alig
 	}
 	pos = grue.Rect{Max: imsz}.AlignToPoint(pos, alh, alv)
 	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
+}
+
+// DrawTooltip ...
+func (s *Surface) DrawTooltip() {
+	if s.tooltip == "" {
+		return
+	}
+	theme := s.GetTheme()
+	drw, _ := theme.Drawers[grue.ThemeTooltip]
+	if drw == nil {
+		return
+	}
+	r := s.GetTextRect(s.tooltip, theme.TooltipFont)
+	r = r.Moved(s.MousePos()).Expanded(theme.Pad).Moved(grue.V(theme.Pad, theme.Pad))
+	drw.Draw(s, r)
+	s.DrawText(s.tooltip, theme.TooltipFont, r, theme.TooltipColor, grue.AlignCenter, grue.AlignCenter)
 }
 
 func (s *Surface) updateMousePos(pos grue.Vec, click bool) {

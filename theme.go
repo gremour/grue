@@ -6,8 +6,13 @@ import "image/color"
 type Theme struct {
 	// Font name used for titles (panels, buttons, etc)
 	TitleFont         string
+	TooltipFont       string
 	TextColor         color.Color
 	DisabledTextColor color.Color
+	TooltipColor      color.Color
+
+	// Pad to insert between border and text in autosized panels
+	Pad float64
 
 	// Drawers
 	Drawers map[ThemeDrawerKey]ThemeDrawer
@@ -29,6 +34,7 @@ const (
 	ThemeButtonDisabled ThemeDrawerKey = "b-d"
 	ThemeButtonHL       ThemeDrawerKey = "b-h"
 	ThemeButtonActive   ThemeDrawerKey = "b-a"
+	ThemeTooltip        ThemeDrawerKey = "tip"
 )
 
 // TexturedPanel contains info needed to draw texturized

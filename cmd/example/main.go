@@ -61,6 +61,7 @@ func runUI() {
 	bt2 := grue.NewPushButton(pn, grue.Base{
 		Rect:     grue.R0(120, 40),
 		Text:     "Grue",
+		Tooltip:  "Graphical UI lib",
 		Disabled: true,
 	})
 	bt2.Place(grue.V(180, 50))

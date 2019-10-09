@@ -58,12 +58,11 @@ func (w *Window) Run() {
 			}
 		}
 
-		// w.ShowTooltip()
-
 		for i, s := range w.surfaces {
 			if i == 0 && s.Config.BackColor != nil && s.Canvas == nil {
 				w.Clear(s.Config.BackColor)
 			}
+			s.DrawTooltip()
 			if s.Canvas != nil {
 				if s.Config.PixelSize == 1 {
 					s.Canvas.Draw(w, pixel.IM.Moved(w.Bounds().Center()))

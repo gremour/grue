@@ -15,8 +15,11 @@ func NewLight(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 
 	theme := grue.Theme{
 		TitleFont:         "light-title",
+		TooltipFont:       "light-title",
 		TextColor:         grue.RGB(0, 0, 0),
 		DisabledTextColor: grue.RGB(0.3, 0.3, 0.3),
+		TooltipColor:      grue.RGB(0, 0, 0),
+		Pad:               8,
 		Drawers: map[grue.ThemeDrawerKey]grue.ThemeDrawer{
 			grue.ThemePanel: grue.PlainRect{
 				BackColor:   grue.RGB(0.7, 0.7, 0.7),
@@ -42,6 +45,11 @@ func NewLight(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 			grue.ThemeButtonActive: grue.TexturedPanel{
 				ImagePrefix: "light-bt-act",
 				Color:       grue.RGB(0.8, 1, 1),
+			},
+			grue.ThemeTooltip: grue.PlainRect{
+				BackColor:   grue.RGB(1, 0.95, 0.8),
+				BorderColor: grue.RGB(0, 0, 0),
+				BorderSize:  1,
 			},
 		},
 	}
