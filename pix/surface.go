@@ -31,10 +31,10 @@ type Surface struct {
 }
 
 // NewPrimarySurface creates new primary surface.
-func NewPrimarySurface(wcfg grue.WindowConfig, scfg grue.SurfaceConfig) (*Surface, error) {
+func NewPrimarySurface(scfg grue.SurfaceConfig) (*Surface, error) {
 	pixelCfg := pixelgl.WindowConfig{
-		Title:  wcfg.Title,
-		Bounds: PRect(wcfg.WindowGeometry),
+		Title:  scfg.Title,
+		Bounds: PRect(scfg.WindowGeometry),
 	}
 
 	win, err := pixelgl.NewWindow(pixelCfg)
@@ -42,7 +42,7 @@ func NewPrimarySurface(wcfg grue.WindowConfig, scfg grue.SurfaceConfig) (*Surfac
 		return nil, err
 	}
 
-	window := newWindow(win, wcfg.FPS)
+	window := newWindow(win, scfg.FPS)
 	return createSurface(window, scfg), nil
 }
 

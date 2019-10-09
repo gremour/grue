@@ -19,20 +19,19 @@ func main() {
 // Good place to read results back is events handler (s.SetEvents).
 // It is called after every update.
 func runUI() {
-	// Window configuration options.
-	wcfg := grue.WindowConfig{
+	// Primary surface configuration options.
+	scfg := grue.SurfaceConfig{
+		// Window options
 		Title:          "Grue example",
 		WindowGeometry: grue.R(0, 0, 1000, 600),
 		FPS:            60,
-	}
-
-	scfg := grue.SurfaceConfig{
+		// Surface options
 		PixelSize: 1,
 		BackColor: grue.RGB(0.1, 0, 0),
 	}
 
 	// Create primary surface (this includes window).
-	s, err := pix.NewPrimarySurface(wcfg, scfg)
+	s, err := pix.NewPrimarySurface(scfg)
 	if err != nil {
 		panic(err)
 	}
