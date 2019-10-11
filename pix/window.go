@@ -52,10 +52,17 @@ func (w *Window) Run() {
 		for _, s := range w.surfaces {
 			s.updateMousePos(GVec(w.MousePosition()), click)
 			if s.root != nil {
-				s.root.ProcessMouse()
-				if s.IsPopUpMode() && w.JustPressed(pixelgl.KeyEscape) {
+				wu := s.PopUpUnder(s.MousePos())
+				if wu == nil {
+					wu = s.Root().WidgetUnder(s.MousePos())
+				}
+				closePopup := s.IsPopUpMode() &&
+					(w.JustPressed(pixelgl.KeyEscape) ||
+						(!s.IsPopUp(wu) && w.JustReleased(pixelgl.MouseButtonLeft)))
+				if closePopup {
 					s.PopDownTo(nil)
 				} else {
+					s.root.ProcessMouse(wu)
 					s.root.ProcessKeys()
 				}
 				s.root.Render()

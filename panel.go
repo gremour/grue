@@ -27,6 +27,13 @@ type Panel struct {
 	// button's one.
 	// Of course, every embedding type must assign itself
 	// to virt to make this work.
+	// WARNING: Virt is required to be used in place of
+	// Widget interface values in any of Panel and
+	// it's derivative types methods. Otherwise "slicing" will
+	// happen and Widget will be in fact Panel (or the type that
+	// used pointer to self when creating value of Widget type)
+	// instead of derivative type. This may have some side-effects,
+	// although comparision is already handled by Equals method.
 	Virt Widget
 
 	// Base is panel's base.
@@ -134,7 +141,8 @@ func (p *Panel) Render() {
 }
 
 // ProcessMouse generates mouse events based on change in mouse coords.
-func (p *Panel) ProcessMouse() {
+// wu holds top widget under mouse.
+func (p *Panel) ProcessMouse(wu Widget) {
 	r := p.GlobalRect()
 	lcont := r.Contains(p.Surface.PrevMousePos())
 	cont := r.Contains(p.Surface.MousePos())
@@ -156,12 +164,6 @@ func (p *Panel) ProcessMouse() {
 
 	checkPress := func(bt Button) {
 		if p.Surface.JustPressed(bt) {
-			if bt == MouseButtonLeft &&
-				p.Surface.IsPopUpMode() &&
-				!p.Surface.IsPopUp(p.Virt) {
-				p.Surface.PopDownTo(nil)
-				return
-			}
 			if p.OnMouseDown != nil {
 				p.OnMouseDown(bt)
 			}
@@ -177,9 +179,11 @@ func (p *Panel) ProcessMouse() {
 			}
 		}
 	}
-	checkPress(MouseButtonLeft)
-	checkPress(MouseButtonRight)
-	checkPress(MouseButtonMiddle)
+	if p.Equals(wu) {
+		checkPress(MouseButtonLeft)
+		checkPress(MouseButtonRight)
+		checkPress(MouseButtonMiddle)
+	}
 
 	if p.Surface.MouseScroll() != V(0, 0) && p.OnMouseWheel != nil {
 		p.OnMouseWheel()
@@ -190,7 +194,7 @@ func (p *Panel) ProcessMouse() {
 	}
 
 	for _, c := range p.Children {
-		c.ProcessMouse()
+		c.ProcessMouse(wu)
 	}
 }
 
@@ -204,6 +208,22 @@ func (p *Panel) ProcessKeys() {
 	for _, c := range p.Children {
 		c.ProcessKeys()
 	}
+}
+
+// WidgetUnder finds widget that is under given pointer coordinates
+func (p *Panel) WidgetUnder(pos Vec) Widget {
+	r := p.GlobalRect()
+	if !r.Contains(pos) {
+		return nil
+	}
+
+	for _, c := range p.Children {
+		wu := c.WidgetUnder(pos)
+		if wu != nil {
+			return wu
+		}
+	}
+	return p.Virt
 }
 
 // GlobalRect is absolute widget rectangle (screen coords).
@@ -305,11 +325,11 @@ func PrintWidgets(w Widget, indent string) {
 	if w == nil {
 		return
 	}
-	fmt.Printf("%vText:%v, Widget=%p, Panel=%p, Virt=%p, parent=%p, children:%v\n",
-		indent, w.GetPanel().Text, w, w.GetPanel(), w.GetPanel().Virt,
+	fmt.Printf("%vText:%v, Widget=%p, Panel=%p, parent=%p, children:%v\n",
+		indent, w.GetPanel().Text, w, w.GetPanel(),
 		w.GetPanel().Parent, w.GetPanel().Children)
 	if w != w.GetPanel().Virt {
-		fmt.Println("!!! WARNING: Widget != Virt !!!")
+		fmt.Println("!!! WARNING: Widget(%p) != Virt(%p) !!!", w, w.GetPanel().Virt)
 	}
 	for _, ch := range w.GetPanel().Children {
 		PrintWidgets(ch, indent+" ")

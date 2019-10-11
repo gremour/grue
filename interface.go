@@ -35,6 +35,10 @@ type Surface interface {
 	// Returns true, if widget or any of its parents is popup.
 	IsPopUp(w Widget) bool
 
+	// PopUpUnder returns widget from popup list (if any),
+	// if it's under pointer coords
+	PopUpUnder(pos Vec) Widget
+
 	// Draw functions
 	DrawFillRect(r Rect, col color.Color)
 	DrawRect(r Rect, col color.Color, thick float64)
@@ -96,8 +100,9 @@ type Widget interface {
 	Close()
 	Foster(ch Widget)
 	Render()
-	ProcessMouse()
+	ProcessMouse(wu Widget)
 	ProcessKeys()
+	WidgetUnder(pos Vec) Widget
 	GlobalRect() Rect
 	Place(rel Vec)
 

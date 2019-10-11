@@ -77,7 +77,7 @@ func runUI() {
 	s.SetEvents(func() {
 	})
 
-	grue.PrintWidgets(s.Root(), "")
+	// grue.PrintWidgets(s.Root(), "")
 
 	// Run main loop.
 	s.Run()

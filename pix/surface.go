@@ -149,6 +149,18 @@ func (s *Surface) PopDownTo(w grue.Widget) {
 	}
 }
 
+// PopUpUnder ...
+func (s *Surface) PopUpUnder(pos grue.Vec) grue.Widget {
+	for i := range s.Popups {
+		p := s.Popups[len(s.Popups)-i-1]
+		wu := p.WidgetUnder(pos)
+		if wu != nil {
+			return wu
+		}
+	}
+	return nil
+}
+
 // IsPopUpMode ...
 func (s *Surface) IsPopUpMode() bool {
 	return len(s.Popups) > 0
@@ -156,10 +168,13 @@ func (s *Surface) IsPopUpMode() bool {
 
 // IsPopUp ...
 func (s *Surface) IsPopUp(w grue.Widget) bool {
+	if w == nil {
+		return false
+	}
 	cnt := 100
 	for w != nil && cnt > 0 {
 		for _, p := range s.Popups {
-			if w.GetPanel() == p {
+			if p.Equals(w) {
 				return true
 			}
 		}
