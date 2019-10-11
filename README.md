@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/grue-logo.png"></p>
+
 # Grue
 
 Go UI lib based on [pixel](https://github.com/faiface/pixel).
