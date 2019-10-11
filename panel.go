@@ -53,7 +53,7 @@ type Interactive struct {
 }
 
 // NewPanel creates new panel.
-func NewPanel(parent Node, b Base) *Panel {
+func NewPanel(parent Widget, b Base) *Panel {
 	w := &Panel{
 		node: &node{},
 		Base: b,
@@ -67,14 +67,14 @@ func NewPanel(parent Node, b Base) *Panel {
 // - sets up virtual;
 // - attaches widget to parent;
 // - derives surface.
-func initWidget(parent Node, w Widget) {
+func initWidget(parent Widget, w Widget) {
 	pn := w.GetPanel()
 	if pn != nil {
 		pn.virt = w
 	}
 	if parent != nil {
-		parent.Foster(w)
-		pw := parent.(Widget).GetPanel()
+		parent.Foster(pn)
+		pw := parent.GetPanel()
 		if pw != nil && pn != nil {
 			pn.Surface = pw.Surface
 		}
@@ -110,6 +110,12 @@ func (w *Panel) Foster(ch Node) {
 
 	ch.setParent(w)
 	w.addChild(ch)
+}
+
+// GetParent returns parent widget
+func (w *Panel) GetParent() Widget {
+	par, _ := w.parent.(Widget)
+	return par
 }
 
 // SubWidgets returns a slice of child widgets.
@@ -186,6 +192,12 @@ func (w *Panel) ProcessMouse() {
 
 	checkPress := func(bt Button) {
 		if w.Surface.JustPressed(bt) {
+			if bt == MouseButtonLeft &&
+				w.Surface.IsPopUpMode() &&
+				!w.Surface.IsPopUp(w) {
+				w.Surface.PopDownTo(nil)
+				return
+			}
 			if w.OnMouseDown != nil {
 				w.OnMouseDown(bt)
 			}
@@ -254,7 +266,7 @@ func (w *Panel) Place(rel Vec) {
 	if parent == nil {
 		return
 	}
-	pw := parent.(Widget)
+	pw, _ := parent.(Widget)
 	if pw == nil {
 		return
 	}

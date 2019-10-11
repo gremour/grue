@@ -10,7 +10,7 @@ type PushButton struct {
 }
 
 // NewPushButton creates new button.
-func NewPushButton(parent Node, b Base) *PushButton {
+func NewPushButton(parent Widget, b Base) *PushButton {
 	w := &PushButton{
 		Panel: NewPanel(nil, b),
 	}

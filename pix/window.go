@@ -53,7 +53,11 @@ func (w *Window) Run() {
 			s.updateMousePos(GVec(w.MousePosition()), click)
 			if s.root != nil {
 				s.root.ProcessMouse()
-				s.root.ProcessKeys()
+				if s.IsPopUpMode() && w.JustPressed(pixelgl.KeyEscape) {
+					s.PopDownTo(nil)
+				} else {
+					s.root.ProcessKeys()
+				}
 				s.root.Render()
 			}
 		}

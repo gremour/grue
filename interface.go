@@ -19,6 +19,22 @@ type Surface interface {
 	// Set current tooltip
 	SetToolTip(tooltip string)
 
+	// Show widget as popup. Popups are closed if mouse is
+	// clicked outside of any popup widget, or
+	// if escape is pressed. Mouse click that closed popup
+	// is not otherwise processed.
+	PopUp(w Widget)
+
+	// Close popups added after this widget.
+	// If passed nil, closes all popups.
+	PopDownTo(w Widget)
+
+	// Returns true, if there are any active popups.
+	IsPopUpMode() bool
+
+	// Returns true, if widget or any of its parents is popup.
+	IsPopUp(w Widget) bool
+
 	// Draw functions
 	DrawFillRect(r Rect, col color.Color)
 	DrawRect(r Rect, col color.Color, thick float64)

@@ -48,6 +48,7 @@ func runUI() {
 
 	pn1 := grue.NewPanel(pn, grue.Base{
 		Rect: grue.R0(250, 100),
+		Text: ":)",
 	})
 	pn1.Place(grue.V(50, 120))
 
@@ -64,6 +65,14 @@ func runUI() {
 		Disabled: true,
 	})
 	bt2.Place(grue.V(180, 50))
+
+	bt1.OnPress = func() {
+		btPop := grue.NewPushButton(s.Root(), grue.Base{
+			Rect: grue.R0(120, 40).Moved(s.MousePos()),
+			Text: "Pop",
+		})
+		s.PopUp(btPop)
+	}
 
 	s.SetEvents(func() {
 	})

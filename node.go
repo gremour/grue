@@ -82,6 +82,7 @@ func (n *node) removeChild(ch Node) {
 				//     [2:5](c to e) replaced by [3:6](d to f)
 			}
 			pch[l-1] = nil
+			n.children = pch[:l-1]
 			break
 		}
 	}

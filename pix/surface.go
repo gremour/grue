@@ -19,6 +19,7 @@ type Surface struct {
 	Config grue.SurfaceConfig
 	Canvas *pixelgl.Canvas
 	Window *Window
+	Popups []grue.Widget
 
 	Rect    grue.Rect
 	tooltip string
@@ -109,6 +110,65 @@ func (s *Surface) SetToolTip(tooltip string) {
 // Root returns root widget for the surface.
 func (s *Surface) Root() grue.Widget {
 	return s.root
+}
+
+// PopUp ...
+func (s *Surface) PopUp(w grue.Widget) {
+	if w == nil {
+		panic("trying to add empty popup")
+	}
+	for _, p := range s.Popups {
+		if w == p {
+			return
+		}
+	}
+	w.GetPanel().Surface = s
+	s.Popups = append(s.Popups, w.GetPanel())
+}
+
+// PopDownTo ...
+func (s *Surface) PopDownTo(w grue.Widget) {
+	found := false
+	ind := 0
+	if w == nil {
+		found = true
+	}
+	for i, p := range s.Popups {
+		if found {
+			s.Popups[i] = nil
+			p.Close()
+		} else if w != nil && w.GetPanel() == p {
+			found = true
+			ind = i + 1
+		}
+	}
+	if ind == 0 {
+		s.Popups = nil
+	} else {
+		s.Popups = s.Popups[:ind]
+	}
+}
+
+// IsPopUpMode ...
+func (s *Surface) IsPopUpMode() bool {
+	return len(s.Popups) > 0
+}
+
+// IsPopUp ...
+func (s *Surface) IsPopUp(w grue.Widget) bool {
+	cnt := 100
+	for w != nil && cnt > 0 {
+		for _, p := range s.Popups {
+			fmt.Printf("IsPopUp w=%p(pn=%p) checking vs %p\n", w, w.GetPanel(), p)
+			if w.GetPanel() == p {
+				return true
+				fmt.Printf("yes\n")
+			}
+		}
+		w = w.GetPanel().GetParent()
+		cnt--
+	}
+	return false
 }
 
 // DrawFillRect draws filled rectangle.
