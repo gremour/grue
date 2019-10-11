@@ -10,6 +10,10 @@ to be reasonably abstract from implementation.
 This is still work in progress. Expect proper examples and tutorial
 after basic functionality is implemented (v0.1.0+).
 
+## Example screenshot
+
+<p align="center"><img src="assets/shot1.png"></p>
+
 ## Running example
 
 ```bash
