@@ -39,6 +39,9 @@ type Panel struct {
 	// Base is panel's base.
 	Base
 
+	// True if pointer is inside the widget
+	PointerInside bool
+
 	// Interactive provides response to input events.
 	Interactive
 
@@ -144,17 +147,17 @@ func (p *Panel) Render() {
 // wu holds top widget under mouse.
 func (p *Panel) ProcessMouse(wu Widget) {
 	r := p.GlobalRect()
-	lcont := r.Contains(p.Surface.PrevMousePos())
 	cont := r.Contains(p.Surface.MousePos())
-	if !lcont && cont {
-		if p.OnMouseIn != nil {
-			p.OnMouseIn()
-		}
-	} else if lcont && !cont {
-		if p.OnMouseOut != nil {
-			p.OnMouseOut()
-		}
+
+	if cont && !p.PointerInside && p.OnMouseIn != nil {
+		p.OnMouseIn()
 	}
+
+	if !cont && p.PointerInside && p.OnMouseOut != nil {
+		p.OnMouseOut()
+	}
+
+	p.PointerInside = cont
 
 	if !cont {
 		return
@@ -329,7 +332,7 @@ func PrintWidgets(w Widget, indent string) {
 		indent, w.GetPanel().Text, w, w.GetPanel(),
 		w.GetPanel().Parent, w.GetPanel().Children)
 	if w != w.GetPanel().Virt {
-		fmt.Println("!!! WARNING: Widget(%p) != Virt(%p) !!!", w, w.GetPanel().Virt)
+		fmt.Printf("!!! WARNING: Widget(%p) != Virt(%p) !!!\n", w, w.GetPanel().Virt)
 	}
 	for _, ch := range w.GetPanel().Children {
 		PrintWidgets(ch, indent+" ")

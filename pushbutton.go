@@ -3,8 +3,7 @@ package grue
 // PushButton is pressable and optionally, checkable (TODO), button.
 type PushButton struct {
 	*Panel
-	Highlited bool
-	Pressed   bool
+	Pressed bool
 
 	OnPress func()
 }
@@ -16,11 +15,7 @@ func NewPushButton(parent Widget, b Base) *PushButton {
 	}
 	InitWidget(parent, pb)
 
-	pb.OnMouseIn = func() {
-		pb.Highlited = true
-	}
 	pb.OnMouseOut = func() {
-		pb.Highlited = false
 		pb.Pressed = false
 	}
 	pb.OnMouseDown = func(bt Button) {
@@ -57,7 +52,7 @@ func (pb *PushButton) Paint() {
 		tcol = theme.DisabledTextColor
 	case pb.Pressed:
 		tcur, _ = theme.Drawers[ThemeButtonActive]
-	case pb.Highlited:
+	case pb.PointerInside:
 		tcur, _ = theme.Drawers[ThemeButtonHL]
 	}
 	if tcur != nil {
