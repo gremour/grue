@@ -45,15 +45,15 @@ type Surface interface {
 
 	// Font is a font name that was previously initialized.
 	// alh, alv -- horizontal and vertical text alignment (see Aling type)
-	DrawText(msg, font string, r Rect, col color.Color, alh, alv Align)
+	DrawText(msg, font string, r Rect, col color.Color, al Align)
 
 	GetTextRect(msg, font string) Rect
 
 	// Draws image centered around pos.
 	DrawImage(name string, pos Vec, col color.Color)
 
-	// Draws image aligned relative to pos.
-	DrawImageAligned(name string, pos Vec, alh, alv Align, col color.Color)
+	// Draws image aligned relative to rect.
+	DrawImageAligned(name string, rect Rect, al Align, col color.Color)
 
 	// Draw image into target rectangle.
 	DrawImageStretched(name string, rect Rect, col color.Color)

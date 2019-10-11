@@ -1,14 +1,20 @@
 package grue
 
-import "fmt"
+import (
+	"fmt"
+	"image/color"
+)
 
 // Base is collection of initializable fields for widget.
 type Base struct {
-	Theme    *Theme
-	Rect     Rect
-	Text     string
-	Tooltip  string
-	Disabled bool
+	Theme      *Theme
+	Rect       Rect
+	Text       string
+	TextAlign  Align
+	Tooltip    string
+	Disabled   bool
+	Image      string
+	ImageAlign Align
 
 	// If true, widget is invisible (but children are).
 	// OnDraw is still called and can paint.
@@ -87,14 +93,19 @@ func NewPanel(parent Widget, b Base) *Panel {
 	return p
 }
 
+// MyTheme returns theme for this panel
+func (p *Panel) MyTheme() *Theme {
+	if p.Theme == nil {
+		return p.Surface.GetTheme()
+	}
+	return p.Theme
+}
+
 // Paint draws panel without children.
 func (p *Panel) Paint() {
 	if !p.Phantom {
 		r := p.GlobalRect()
-		theme := p.Theme
-		if theme == nil {
-			theme = p.Surface.GetTheme()
-		}
+		theme := p.MyTheme()
 		tdef, _ := theme.Drawers[ThemePanel]
 		var tcur ThemeDrawer
 		tcol := theme.TextColor
@@ -109,12 +120,55 @@ func (p *Panel) Paint() {
 		if tdef != nil {
 			tdef.Draw(p.Surface, r)
 		}
-		if len(p.Text) > 0 {
-			p.Surface.DrawText(p.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
-		}
+		p.DrawImageAndText(tcol)
 	}
 	if p.OnDraw != nil {
 		p.OnDraw()
+	}
+}
+
+// DrawImageAndText draws image and/or text according to alignment.
+func (p *Panel) DrawImageAndText(textColor color.Color) {
+	theme := p.MyTheme()
+	imsz, _ := p.Surface.GetImageSize(p.Image)
+	innerRect := p.GlobalRect().Expanded(-theme.Pad)
+
+	imal := p.ImageAlign
+	if imal == AlignDefault {
+		imal = AlignLeft
+	}
+	p.Surface.DrawImageAligned(p.Image, innerRect, imal, nil)
+	_ = imsz
+
+	txal := p.TextAlign
+	dimg := theme.Pad
+	if p.Image == "" {
+		dimg = 0
+	} else {
+		if p.TextAlign == AlignDefault {
+			txal = AlignLeft
+		}
+	}
+
+	textRect := innerRect
+	if p.Text != "" {
+		switch p.ImageAlign {
+		case AlignDefault:
+			fallthrough
+		case AlignTopLeft:
+			fallthrough
+		case AlignBottomLeft:
+			fallthrough
+		case AlignLeft:
+			textRect = innerRect.Extended(-imsz.X-dimg, 0, 0, 0)
+		case AlignTopRight:
+			fallthrough
+		case AlignBottomRight:
+			fallthrough
+		case AlignRight:
+			textRect = innerRect.Extended(0, 0, -imsz.X-dimg, 0)
+		}
+		p.Surface.DrawText(p.Text, theme.TitleFont, textRect, textColor, txal)
 	}
 }
 

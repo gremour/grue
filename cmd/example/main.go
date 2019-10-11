@@ -41,6 +41,11 @@ func runUI() {
 		panic(err)
 	}
 
+	err = s.InitImages("assets/images.json")
+	if err != nil {
+		panic(err)
+	}
+
 	// Create toplevel panel.
 	pn := grue.NewPanel(s.Root(), grue.Base{
 		Rect: grue.R(20, 20, 480, 280),
@@ -59,10 +64,13 @@ func runUI() {
 	bt1.Place(grue.V(50, 50))
 
 	bt2 := grue.NewPushButton(pn, grue.Base{
-		Rect:     grue.R0(120, 40),
-		Text:     "Grue",
+		Rect: grue.R0(200, 40),
+		Text: "Grue",
+		// TextAlign:  grue.AlignRight,
 		Tooltip:  "Graphical UI lib",
 		Disabled: true,
+		Image:    "grue-logo20",
+		// ImageAlign: grue.AlignRight,
 	})
 	bt2.Place(grue.V(180, 50))
 

@@ -214,7 +214,7 @@ func (s *Surface) DrawRect(r grue.Rect, col color.Color, thick float64) {
 }
 
 // DrawText draws text with given color, font and alignment.
-func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, alh, alv grue.Align) {
+func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, al grue.Align) {
 	if len(msg) == 0 {
 		return
 	}
@@ -227,7 +227,7 @@ func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, alh, 
 	tsz.Max.Y -= atl.LineHeight() / 2
 	txt.Color = col
 	fmt.Fprintf(txt, msg)
-	pos := GRect(tsz).AlignToRect(r, alh, alv)
+	pos := GRect(tsz).AlignToRect(r, al)
 	pos = pos.Sub(grue.V(tsz.W()/2, tsz.H()/2))
 	txt.Draw(s.target(), pixel.IM.Moved(PVec(pos)))
 }
@@ -273,7 +273,7 @@ func (s *Surface) DrawImageStretched(name string, rect grue.Rect, col color.Colo
 }
 
 // DrawImageAligned ...
-func (s *Surface) DrawImageAligned(name string, pos grue.Vec, alh, alv grue.Align, col color.Color) {
+func (s *Surface) DrawImageAligned(name string, rect grue.Rect, al grue.Align, col color.Color) {
 	im, err := s.GetImage(name)
 	if err != nil {
 		return
@@ -282,7 +282,7 @@ func (s *Surface) DrawImageAligned(name string, pos grue.Vec, alh, alv grue.Alig
 	if err != nil {
 		return
 	}
-	pos = grue.Rect{Max: imsz}.AlignToPoint(pos, alh, alv)
+	pos := grue.Rect{Max: imsz}.AlignToRect(rect, al)
 	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
 }
 
@@ -299,7 +299,7 @@ func (s *Surface) DrawTooltip() {
 	r := s.GetTextRect(s.tooltip, theme.TooltipFont)
 	r = r.Moved(s.MousePos()).Expanded(theme.Pad).Moved(grue.V(theme.Pad, theme.Pad))
 	drw.Draw(s, r)
-	s.DrawText(s.tooltip, theme.TooltipFont, r, theme.TooltipColor, grue.AlignCenter, grue.AlignCenter)
+	s.DrawText(s.tooltip, theme.TooltipFont, r, theme.TooltipColor, grue.AlignCenter)
 }
 
 func (s *Surface) updateMousePos(pos grue.Vec, click bool) {

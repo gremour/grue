@@ -1,0 +1,12 @@
+{
+    "file": "images.png",
+    "sheets": [
+        {
+            "x_offset": 0,
+            "y_offset": 0,
+            "width": 20,
+            "height": 20,
+            "names": ["grue-logo20"]
+        }
+    ]
+}

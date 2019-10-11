@@ -34,6 +34,14 @@ func (v Vec) Half() Vec {
 	}
 }
 
+// ZR return zero size rectangle centered at the point.
+func (v Vec) ZR() Rect {
+	return Rect{
+		Min: v,
+		Max: v,
+	}
+}
+
 // Rect describes rectangular area on surface.
 type Rect struct {
 	Min, Max Vec
@@ -75,6 +83,16 @@ func (r Rect) Expanded(d float64) Rect {
 	return r
 }
 
+// Extended returns expanded rectangle by given distances in pixels.
+// If distance is negative, rectangle is shrunk instead.
+func (r Rect) Extended(left, bottom, right, top float64) Rect {
+	r.Min.X -= left
+	r.Min.Y -= bottom
+	r.Max.X += right
+	r.Max.Y += top
+	return r
+}
+
 // Moved returns the Rect moved (both Min and Max) by the given vector delta.
 func (r Rect) Moved(delta Vec) Rect {
 	return Rect{
@@ -106,39 +124,71 @@ func R0(w, h float64) Rect {
 	return Rect{Max: V(w, h)}
 }
 
-// Align defines object alignment relative to parent
+// Align defines object alignment relative to parent.
 type Align int
 
 const (
-	// AlignCenter ...
-	AlignCenter Align = 0
+	// AlignDefault is default align (center in most cases)
+	AlignDefault Align = 0
 	// AlignLeft ...
-	AlignLeft Align = -1
+	AlignLeft Align = 1
 	// AlignRight ...
-	AlignRight Align = 1
+	AlignRight Align = 2
 	// AlignTop ...
-	AlignTop Align = 1
+	AlignTop Align = 3
 	// AlignBottom ...
-	AlignBottom Align = -1
+	AlignBottom Align = 4
+
+	// AlignTopLeft ...
+	AlignTopLeft Align = 5
+	// AlignTopRight ...
+	AlignTopRight Align = 6
+	// AlignBottomLeft ...
+	AlignBottomLeft Align = 7
+	// AlignBottomRight ...
+	AlignBottomRight Align = 8
+
+	// AlignCenter is explicit center alignment
+	AlignCenter Align = 10
 )
 
 // AlignToRect returns a Vec that src Rect have to be
 // moved by in order to align relative to dst Rect given
 // alignments alh, alv.
-func (r Rect) AlignToRect(dst Rect, alh, alv Align) Vec {
+func (r Rect) AlignToRect(dst Rect, al Align) Vec {
 	delta := dst.Center()
-	switch alh {
+	switch al {
+	case AlignDefault:
+		fallthrough
 	case AlignCenter:
+	case AlignTopRight:
+		fallthrough
+	case AlignBottomRight:
+		fallthrough
 	case AlignRight:
 		delta.X += (dst.W() - r.W()) / 2
+	case AlignTopLeft:
+		fallthrough
+	case AlignBottomLeft:
+		fallthrough
 	case AlignLeft:
 		delta.X -= (dst.W() - r.W()) / 2
 	default:
 	}
-	switch alv {
+	switch al {
+	case AlignDefault:
+		fallthrough
 	case AlignCenter:
+	case AlignTopLeft:
+		fallthrough
+	case AlignTopRight:
+		fallthrough
 	case AlignTop:
 		delta.Y += (dst.H() - r.H()) / 2
+	case AlignBottomLeft:
+		fallthrough
+	case AlignBottomRight:
+		fallthrough
 	case AlignBottom:
 		delta.Y -= (dst.H() - r.H()) / 2
 	default:
@@ -149,6 +199,6 @@ func (r Rect) AlignToRect(dst Rect, alh, alv Align) Vec {
 // AlignToPoint returns a Vec that src Rect have to be
 // moved by in order to align relative to dst Point given
 // alignments alh, alv.
-func (r Rect) AlignToPoint(dst Vec, alh, alv Align) Vec {
-	return r.AlignToRect(Rect{dst, dst}, alh, alv)
+func (r Rect) AlignToPoint(dst Vec, al Align) Vec {
+	return r.AlignToRect(Rect{dst, dst}, al)
 }

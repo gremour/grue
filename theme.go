@@ -81,20 +81,20 @@ func (tp TexturedPanel) Draw(s Surface, rect Rect) {
 		tp.Color)
 
 	s.DrawImageAligned(tp.ImagePrefix+"-tl",
-		V(rect.Min.X, rect.Max.Y),
-		AlignLeft, AlignTop,
+		V(rect.Min.X, rect.Max.Y).ZR(),
+		AlignTopLeft,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-tr",
-		V(rect.Max.X, rect.Max.Y),
-		AlignRight, AlignTop,
+		V(rect.Max.X, rect.Max.Y).ZR(),
+		AlignTopRight,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-bl",
-		V(rect.Min.X, rect.Min.Y),
-		AlignLeft, AlignBottom,
+		V(rect.Min.X, rect.Min.Y).ZR(),
+		AlignBottomLeft,
 		tp.Color)
 	s.DrawImageAligned(tp.ImagePrefix+"-br",
-		V(rect.Max.X, rect.Min.Y),
-		AlignRight, AlignBottom,
+		V(rect.Max.X, rect.Min.Y).ZR(),
+		AlignBottomRight,
 		tp.Color)
 }
 

@@ -39,10 +39,7 @@ func NewPushButton(parent Widget, b Base) *PushButton {
 // Paint draws the widget without children.
 func (pb *PushButton) Paint() {
 	r := pb.GlobalRect()
-	theme := pb.Theme
-	if theme == nil {
-		theme = pb.Surface.GetTheme()
-	}
+	theme := pb.MyTheme()
 	tdef, _ := theme.Drawers[ThemeButton]
 	var tcur ThemeDrawer
 	tcol := theme.TextColor
@@ -61,7 +58,5 @@ func (pb *PushButton) Paint() {
 	if tdef != nil {
 		tdef.Draw(pb.Surface, r)
 	}
-	if len(pb.Text) > 0 {
-		pb.Surface.DrawText(pb.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
-	}
+	pb.DrawImageAndText(tcol)
 }
