@@ -1,5 +1,7 @@
 package grue
 
+import "fmt"
+
 // Base is collection of initializable fields for widget.
 type Base struct {
 	Theme    *Theme
@@ -16,8 +18,8 @@ type Base struct {
 // Panel is simple widget with background color and border.
 // It can contain text and/or image.
 type Panel struct {
-	// Node implements tree-like hierarchy.
-	*node
+	Parent   Widget
+	Children []Widget
 
 	// Virt is interface by which virtual calls can be made,
 	// i. e. this panel might be embedded to button, then
@@ -25,7 +27,7 @@ type Panel struct {
 	// button's one.
 	// Of course, every embedding type must assign itself
 	// to virt to make this work.
-	virt Widget
+	Virt Widget
 
 	// Base is panel's base.
 	Base
@@ -33,7 +35,7 @@ type Panel struct {
 	// Interactive provides response to input events.
 	Interactive
 
-	// Custom drawing function.
+	// Custom drawing function. Called from Paint.
 	OnDraw func()
 
 	// Graphics surface.
@@ -52,97 +54,42 @@ type Interactive struct {
 	OnKeys       func() bool
 }
 
-// NewPanel creates new panel.
-func NewPanel(parent Widget, b Base) *Panel {
-	w := &Panel{
-		node: &node{},
-		Base: b,
-	}
-	initWidget(parent, w)
-	return w
-}
-
-// initWidget initializes specific Widget behavior which must be
+// InitWidget initializes specific Widget behavior which must be
 // repeated in all panel descendants by actual type:
 // - sets up virtual;
 // - attaches widget to parent;
 // - derives surface.
-func initWidget(parent Widget, w Widget) {
-	pn := w.GetPanel()
-	if pn != nil {
-		pn.virt = w
-	}
-	if parent != nil {
-		parent.Foster(pn)
-		pw := parent.GetPanel()
-		if pw != nil && pn != nil {
-			pn.Surface = pw.Surface
-		}
-	}
-}
-
-// Close removes panel from tree.
-// It is needed over node.Close, because that operates on
-// *node part of Panel, but must operate on *Panel.
-// It's suitable for descendants without redefenition:
-// node tree will contain Panels only, who exhibit
-// virtual behaviour (via w.virt).
-func (w *Panel) Close() {
-	w.removeChildren()
-	if w.parent != nil {
-		w.parent.removeChild(w)
-		w.parent = nil
-	}
-}
-
-// Foster ... (same).
-func (w *Panel) Foster(ch Node) {
-	if ch == nil {
+func InitWidget(parent Widget, w Widget) {
+	w.GetPanel().Virt = w
+	if parent == nil {
 		return
 	}
-	p := ch.getParent()
-	if p == w {
-		return
-	}
-	if p != nil {
-		p.removeChild(ch)
-	}
-
-	ch.setParent(w)
-	w.addChild(ch)
+	parent.Foster(w)
+	w.GetPanel().Surface = parent.GetPanel().Surface
 }
 
-// GetParent returns parent widget
-func (w *Panel) GetParent() Widget {
-	par, _ := w.parent.(Widget)
-	return par
-}
-
-// SubWidgets returns a slice of child widgets.
-func (w *Panel) SubWidgets() []Widget {
-	sns := w.SubNodes()
-	res := make([]Widget, 0, len(sns))
-	for _, v := range sns {
-		if wv, ok := v.(Widget); ok {
-			res = append(res, wv)
-		}
+// NewPanel creates new panel.
+func NewPanel(parent Widget, b Base) *Panel {
+	p := &Panel{
+		Base: b,
 	}
-	return res
+	InitWidget(parent, p)
+	return p
 }
 
-// Paint draws the widget without children.
-func (w *Panel) paint() {
-	if !w.Phantom {
-		r := w.GlobalRect()
-		theme := w.Theme
+// Paint draws panel without children.
+func (p *Panel) Paint() {
+	if !p.Phantom {
+		r := p.GlobalRect()
+		theme := p.Theme
 		if theme == nil {
-			theme = w.Surface.GetTheme()
+			theme = p.Surface.GetTheme()
 		}
 		tdef, _ := theme.Drawers[ThemePanel]
 		var tcur ThemeDrawer
 		tcol := theme.TextColor
 		switch {
-		case w.Disabled:
+		case p.Disabled:
 			tcur, _ = theme.Drawers[ThemePanelDisabled]
 			tcol = theme.DisabledTextColor
 		}
@@ -150,37 +97,54 @@ func (w *Panel) paint() {
 			tdef = tcur
 		}
 		if tdef != nil {
-			tdef.Draw(w.Surface, r)
+			tdef.Draw(p.Surface, r)
 		}
-		if len(w.Text) > 0 {
-			w.Surface.DrawText(w.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
+		if len(p.Text) > 0 {
+			p.Surface.DrawText(p.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
 		}
 	}
-	if w.OnDraw != nil {
-		w.OnDraw()
+	if p.OnDraw != nil {
+		p.OnDraw()
 	}
 }
 
+// GetPanel returns widget's panel
+func (p *Panel) GetPanel() *Panel {
+	return p
+}
+
+// Equals checks if panel and passed
+// widget are both the same object
+func (p *Panel) Equals(w Widget) bool {
+	if p == nil && w == nil {
+		return true
+	}
+	if p == nil || w == nil {
+		return false
+	}
+	return p.Virt == w.GetPanel().Virt
+}
+
 // Render widget and its children on the screen.
-func (w *Panel) Render() {
-	w.virt.paint()
-	for _, c := range w.SubWidgets() {
+func (p *Panel) Render() {
+	p.Virt.Paint()
+	for _, c := range p.Children {
 		c.Render()
 	}
 }
 
 // ProcessMouse generates mouse events based on change in mouse coords.
-func (w *Panel) ProcessMouse() {
-	r := w.GlobalRect()
-	lcont := r.Contains(w.Surface.PrevMousePos())
-	cont := r.Contains(w.Surface.MousePos())
+func (p *Panel) ProcessMouse() {
+	r := p.GlobalRect()
+	lcont := r.Contains(p.Surface.PrevMousePos())
+	cont := r.Contains(p.Surface.MousePos())
 	if !lcont && cont {
-		if w.OnMouseIn != nil {
-			w.OnMouseIn()
+		if p.OnMouseIn != nil {
+			p.OnMouseIn()
 		}
 	} else if lcont && !cont {
-		if w.OnMouseOut != nil {
-			w.OnMouseOut()
+		if p.OnMouseOut != nil {
+			p.OnMouseOut()
 		}
 	}
 
@@ -188,28 +152,28 @@ func (w *Panel) ProcessMouse() {
 		return
 	}
 
-	w.Surface.SetToolTip(w.Tooltip)
+	p.Surface.SetToolTip(p.Tooltip)
 
 	checkPress := func(bt Button) {
-		if w.Surface.JustPressed(bt) {
+		if p.Surface.JustPressed(bt) {
 			if bt == MouseButtonLeft &&
-				w.Surface.IsPopUpMode() &&
-				!w.Surface.IsPopUp(w) {
-				w.Surface.PopDownTo(nil)
+				p.Surface.IsPopUpMode() &&
+				!p.Surface.IsPopUp(p.Virt) {
+				p.Surface.PopDownTo(nil)
 				return
 			}
-			if w.OnMouseDown != nil {
-				w.OnMouseDown(bt)
+			if p.OnMouseDown != nil {
+				p.OnMouseDown(bt)
 			}
 		}
-		if w.Surface.JustReleased(bt) {
-			if w.OnMouseUp != nil {
-				w.OnMouseUp(bt)
+		if p.Surface.JustReleased(bt) {
+			if p.OnMouseUp != nil {
+				p.OnMouseUp(bt)
 			}
-			len := w.Surface.PrevMousePos().Add(
-				V(-w.Surface.ClickMousePos().X, -w.Surface.ClickMousePos().Y)).Len()
-			if len <= 8 && w.OnMouseClick != nil {
-				w.OnMouseClick(bt)
+			len := p.Surface.PrevMousePos().Add(
+				V(-p.Surface.ClickMousePos().X, -p.Surface.ClickMousePos().Y)).Len()
+			if len <= 8 && p.OnMouseClick != nil {
+				p.OnMouseClick(bt)
 			}
 		}
 	}
@@ -217,15 +181,15 @@ func (w *Panel) ProcessMouse() {
 	checkPress(MouseButtonRight)
 	checkPress(MouseButtonMiddle)
 
-	if w.Surface.MouseScroll() != V(0, 0) && w.OnMouseWheel != nil {
-		w.OnMouseWheel()
+	if p.Surface.MouseScroll() != V(0, 0) && p.OnMouseWheel != nil {
+		p.OnMouseWheel()
 	}
 
-	if w.Surface.PrevMousePos() != w.Surface.MousePos() && w.OnMouseMove != nil {
-		w.OnMouseMove()
+	if p.Surface.PrevMousePos() != p.Surface.MousePos() && p.OnMouseMove != nil {
+		p.OnMouseMove()
 	}
 
-	for _, c := range w.SubWidgets() {
+	for _, c := range p.Children {
 		c.ProcessMouse()
 	}
 }
@@ -233,51 +197,121 @@ func (w *Panel) ProcessMouse() {
 // ProcessKeys calls keyboard handlers on the widget
 // hierarchy. If any widget reports, that key is processed,
 // event propagation stops.
-func (w *Panel) ProcessKeys() {
-	if w.OnKeys != nil && w.OnKeys() {
+func (p *Panel) ProcessKeys() {
+	if p.OnKeys != nil && p.OnKeys() {
 		return
 	}
-	for _, c := range w.SubWidgets() {
+	for _, c := range p.Children {
 		c.ProcessKeys()
 	}
 }
 
-// GetPanel returns panel part of the widget.
-func (w *Panel) GetPanel() *Panel {
-	return w
-}
-
 // GlobalRect is absolute widget rectangle (screen coords).
-func (w *Panel) GlobalRect() (r Rect) {
-	r = w.Rect
-	if w.parent == nil {
+func (p *Panel) GlobalRect() (r Rect) {
+	r = p.Rect
+	if p.Parent == nil {
 		return
 	}
-	parent := w.parent.(Widget)
-	r = r.Moved(parent.GetPanel().GlobalRect().Min)
+	parent := p.Parent
+	r = r.Moved(parent.GlobalRect().Min)
 	return
 }
 
 // Place moves Widget to position relative to it's parent.
 // Positive numbers set position relative to left/bottom edges
 // of parent. Negative -- to right/top.
-func (w *Panel) Place(rel Vec) {
-	parent := w.getParent()
+func (p *Panel) Place(rel Vec) {
+	parent := p.Parent
 	if parent == nil {
 		return
 	}
-	pw, _ := parent.(Widget)
-	if pw == nil {
-		return
-	}
-	ppn := pw.GetPanel()
+	ppn := parent.GetPanel()
 	if rel.X < 0 {
-		rel.X = ppn.Rect.Size().X - w.Rect.Size().X - (rel.X + 1)
+		rel.X = ppn.Rect.Size().X - p.Rect.Size().X - (rel.X + 1)
 	}
 	if rel.Y < 0 {
-		rel.Y = ppn.Rect.Size().Y - w.Rect.Size().Y - (rel.Y + 1)
+		rel.Y = ppn.Rect.Size().Y - p.Rect.Size().Y - (rel.Y + 1)
 	}
-	sz := V(w.Rect.Size().X, w.Rect.Size().Y)
-	w.Rect.Min = rel
-	w.Rect.Max = w.Rect.Min.Add(sz)
+	sz := V(p.Rect.Size().X, p.Rect.Size().Y)
+	p.Rect.Min = rel
+	p.Rect.Max = p.Rect.Min.Add(sz)
+}
+
+// Close widget and its children.
+func (p *Panel) Close() {
+	p.removeChildren()
+	if p.Parent != nil {
+		p.Parent.removeChild(p.Virt)
+		p.Parent = nil
+	}
+}
+
+// Foster reconnects widget to this parent,
+// removing it from previous parent if needed.
+func (p *Panel) Foster(ch Widget) {
+	if ch == nil || p == nil {
+		return
+	}
+	par := ch.GetPanel().Parent
+	if p.Equals(par) {
+		return
+	}
+	if par != nil {
+		par.removeChild(ch)
+	}
+	ch.GetPanel().Parent = p.Virt
+	p.addChild(ch)
+}
+
+func (p *Panel) addChild(ch Widget) {
+	for _, c := range p.Children {
+		if c.Equals(ch) {
+			// already in children.
+			return
+		}
+	}
+	p.Children = append(p.Children, ch)
+}
+
+func (p *Panel) removeChild(ch Widget) {
+	pch := p.Children
+	l := len(pch)
+	for i, c := range pch {
+		if c.Equals(ch) {
+			if i < l-1 {
+				copy(pch[i:l-1], pch[i+1:])
+				// 0 1 2 3 4 5
+				// a b c d e f
+				//     ^i=2 l=6
+				//     [2:5](c to e) replaced by [3:6](d to f)
+			}
+			pch[l-1] = nil
+			p.Children = pch[:l-1]
+			break
+		}
+	}
+}
+
+func (p *Panel) removeChildren() {
+	for _, c := range p.Children {
+		c.GetPanel().Parent = nil
+		c.Close()
+	}
+	p.Children = nil
+}
+
+// PrintWidgets prints a tree of widgets for debugging.
+func PrintWidgets(w Widget, indent string) {
+	if w == nil {
+		return
+	}
+	fmt.Printf("%vText:%v, Widget=%p, Panel=%p, Virt=%p, parent=%p, children:%v\n",
+		indent, w.GetPanel().Text, w, w.GetPanel(), w.GetPanel().Virt,
+		w.GetPanel().Parent, w.GetPanel().Children)
+	if w != w.GetPanel().Virt {
+		fmt.Println("!!! WARNING: Widget != Virt !!!")
+	}
+	for _, ch := range w.GetPanel().Children {
+		PrintWidgets(ch, indent+" ")
+	}
 }

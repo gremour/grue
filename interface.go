@@ -83,17 +83,28 @@ type Surface interface {
 }
 
 // Widget is an interface for widgets functionality.
+// This is implemented by Panel type.
+// Derived types must embed *Panel type to inherit this
+// interface.
 type Widget interface {
-	Node
+	// This should be redefined in derived types
+	Paint()
 
-	SubWidgets() []Widget
+	// Panel implementation of these should be sufficient
 	GetPanel() *Panel
+	Equals(w Widget) bool
+	Close()
+	Foster(ch Widget)
 	Render()
 	ProcessMouse()
 	ProcessKeys()
 	GlobalRect() Rect
+	Place(rel Vec)
 
-	paint()
+	// Private methods -- manipulating tree structure
+	addChild(ch Widget)
+	removeChild(ch Widget)
+	removeChildren()
 }
 
 // Charset represents character set for use in fonts

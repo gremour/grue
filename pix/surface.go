@@ -159,13 +159,11 @@ func (s *Surface) IsPopUp(w grue.Widget) bool {
 	cnt := 100
 	for w != nil && cnt > 0 {
 		for _, p := range s.Popups {
-			fmt.Printf("IsPopUp w=%p(pn=%p) checking vs %p\n", w, w.GetPanel(), p)
 			if w.GetPanel() == p {
 				return true
-				fmt.Printf("yes\n")
 			}
 		}
-		w = w.GetPanel().GetParent()
+		w = w.GetPanel().Parent
 		cnt--
 	}
 	return false

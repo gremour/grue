@@ -3,70 +3,70 @@ package grue
 // PushButton is pressable and optionally, checkable (TODO), button.
 type PushButton struct {
 	*Panel
-	Hilited bool
-	Pressed bool
+	Highlited bool
+	Pressed   bool
 
 	OnPress func()
 }
 
 // NewPushButton creates new button.
 func NewPushButton(parent Widget, b Base) *PushButton {
-	w := &PushButton{
+	pb := &PushButton{
 		Panel: NewPanel(nil, b),
 	}
-	initWidget(parent, w)
+	InitWidget(parent, pb)
 
-	w.OnMouseIn = func() {
-		w.Hilited = true
+	pb.OnMouseIn = func() {
+		pb.Highlited = true
 	}
-	w.OnMouseOut = func() {
-		w.Hilited = false
-		w.Pressed = false
+	pb.OnMouseOut = func() {
+		pb.Highlited = false
+		pb.Pressed = false
 	}
-	w.OnMouseDown = func(bt Button) {
+	pb.OnMouseDown = func(bt Button) {
 		if bt != MouseButtonLeft {
 			return
 		}
-		w.Pressed = true
+		pb.Pressed = true
 	}
-	w.OnMouseUp = func(bt Button) {
+	pb.OnMouseUp = func(bt Button) {
 		if bt != MouseButtonLeft {
 			return
 		}
-		w.Pressed = false
-		if w.OnPress != nil {
-			w.OnPress()
+		pb.Pressed = false
+		if pb.OnPress != nil {
+			pb.OnPress()
 		}
 	}
-	return w
+	return pb
 }
 
 // Paint draws the widget without children.
-func (w *PushButton) paint() {
-	r := w.GlobalRect()
-	theme := w.Theme
+func (pb *PushButton) Paint() {
+	r := pb.GlobalRect()
+	theme := pb.Theme
 	if theme == nil {
-		theme = w.Surface.GetTheme()
+		theme = pb.Surface.GetTheme()
 	}
 	tdef, _ := theme.Drawers[ThemeButton]
 	var tcur ThemeDrawer
 	tcol := theme.TextColor
 	switch {
-	case w.Disabled:
+	case pb.Disabled:
 		tcur, _ = theme.Drawers[ThemeButtonDisabled]
 		tcol = theme.DisabledTextColor
-	case w.Pressed:
+	case pb.Pressed:
 		tcur, _ = theme.Drawers[ThemeButtonActive]
-	case w.Hilited:
+	case pb.Highlited:
 		tcur, _ = theme.Drawers[ThemeButtonHL]
 	}
 	if tcur != nil {
 		tdef = tcur
 	}
 	if tdef != nil {
-		tdef.Draw(w.Surface, r)
+		tdef.Draw(pb.Surface, r)
 	}
-	if len(w.Text) > 0 {
-		w.Surface.DrawText(w.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
+	if len(pb.Text) > 0 {
+		pb.Surface.DrawText(pb.Text, theme.TitleFont, r, tcol, AlignCenter, AlignCenter)
 	}
 }
