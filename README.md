@@ -16,11 +16,8 @@ go run ./cmd/example
 
 ## Basic functionality TODO
 
-- Panel and pushbutton displaying aligned image and/or text;
-- Tooltips;
 - Line edit;
 - Checkbutton;
-- Popups;
 - Pixel precise drawing (flooring float values);
 - Clipping & tiling support for backgrounds;
 - Layout helper;
