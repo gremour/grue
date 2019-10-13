@@ -9,13 +9,15 @@ type Theme struct {
 	TooltipFont       string
 	TextColor         color.Color
 	DisabledTextColor color.Color
+	PlaceholderColor  color.Color
 	TooltipColor      color.Color
 
 	// Pad to insert between border and text in autosized panels
 	Pad float64
 
 	// Drawers
-	Drawers map[ThemeDrawerKey]ThemeDrawer
+	Drawers      map[ThemeDrawerKey]ThemeDrawer
+	CursorDrawer CursorDrawer
 }
 
 // ThemeDrawer is interface to draw rectangular panels.
@@ -34,6 +36,7 @@ const (
 	ThemeButtonDisabled ThemeDrawerKey = "b-d"
 	ThemeButtonHL       ThemeDrawerKey = "b-h"
 	ThemeButtonActive   ThemeDrawerKey = "b-a"
+	ThemeLineEdit       ThemeDrawerKey = "le"
 	ThemeTooltip        ThemeDrawerKey = "tip"
 )
 
@@ -114,4 +117,29 @@ func (pr PlainRect) Draw(s Surface, rect Rect) {
 	if pr.BorderColor != nil && pr.BorderSize > 0 {
 		s.DrawRect(rect.Expanded(-pr.BorderInset), pr.BorderColor, pr.BorderSize)
 	}
+}
+
+// RectCursorDrawer ...
+type RectCursorDrawer struct {
+	Color1        color.Color
+	Color2        color.Color
+	Width         float64
+	PulseInterval float64
+}
+
+// CursorDrawer implements structure that can draw a cursor.
+type CursorDrawer interface {
+	Draw(s Surface, pos Vec, height float64)
+}
+
+// Draw ...
+func (cd RectCursorDrawer) Draw(s Surface, pos Vec, height float64) {
+	if cd.PulseInterval == 0 {
+		cd.PulseInterval = 1
+	}
+	if cd.Width == 0 {
+		cd.Width = 2
+	}
+	col := ColorInterpolate(cd.Color1, cd.Color2, s.Pulse(cd.PulseInterval))
+	s.DrawFillRect(R(pos.X, pos.Y, pos.X+cd.Width, pos.Y+height), col)
 }

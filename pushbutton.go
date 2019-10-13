@@ -58,5 +58,5 @@ func (pb *PushButton) Paint() {
 	if tdef != nil {
 		tdef.Draw(pb.Surface, r)
 	}
-	pb.DrawImageAndText(tcol)
+	pb.DrawImageAndText(pb.Image, pb.Text, tcol, pb.ImageAlign, pb.TextAlign)
 }

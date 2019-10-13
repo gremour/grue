@@ -80,12 +80,13 @@ func createSurface(window *Window, scfg grue.SurfaceConfig) *Surface {
 		s.Canvas = pixelgl.NewCanvas(PRect(s.Rect))
 	}
 	s.Window.surfaces = append(s.Window.surfaces, s)
-	s.root = grue.NewPanel(nil, grue.Base{Rect: s.Rect, Phantom: true})
+	s.root = grue.NewPanel(nil, grue.Base{Rect: s.Rect, Theme: &grue.Theme{}})
 	s.root.GetPanel().Surface = s
 	return s
 }
 
-func (s *Surface) target() pixel.Target {
+// Target return pixel target to draw on.
+func (s *Surface) Target() pixel.Target {
 	if s.Canvas == nil {
 		return s.Window
 	}
@@ -110,6 +111,16 @@ func (s *Surface) SetToolTip(tooltip string) {
 // Root returns root widget for the surface.
 func (s *Surface) Root() grue.Widget {
 	return s.root
+}
+
+// SetFocus ...
+func (s *Surface) SetFocus(w grue.Widget) {
+	s.Window.focus = w
+}
+
+// Focus ...
+func (s *Surface) Focus() grue.Widget {
+	return s.Window.focus
 }
 
 // PopUp ...
@@ -191,7 +202,7 @@ func (s *Surface) DrawFillRect(r grue.Rect, col color.Color) {
 	imd.Push(PVec(r.Min))
 	imd.Push(PVec(r.Max))
 	imd.Rectangle(0)
-	imd.Draw(s.target())
+	imd.Draw(s.Target())
 }
 
 // DrawRect draws rectlangle with given line thickness.
@@ -210,7 +221,7 @@ func (s *Surface) DrawRect(r grue.Rect, col color.Color, thick float64) {
 	imd.Push(pixel.V(r.Max.X-thick, r.Min.Y+thick))
 	imd.Push(pixel.V(r.Max.X, r.Max.Y-thick))
 	imd.Rectangle(0)
-	imd.Draw(s.target())
+	imd.Draw(s.Target())
 }
 
 // DrawText draws text with given color, font and alignment.
@@ -229,7 +240,7 @@ func (s *Surface) DrawText(msg, font string, r grue.Rect, col color.Color, al gr
 	fmt.Fprintf(txt, msg)
 	pos := GRect(tsz).AlignToRect(r, al)
 	pos = pos.Sub(grue.V(tsz.W()/2, tsz.H()/2))
-	txt.Draw(s.target(), pixel.IM.Moved(PVec(pos)))
+	txt.Draw(s.Target(), pixel.IM.Moved(PVec(pos)))
 }
 
 // GetTextRect ...
@@ -253,7 +264,7 @@ func (s *Surface) DrawImage(name string, pos grue.Vec, col color.Color) {
 	if err != nil {
 		return
 	}
-	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
+	im.DrawColorMask(s.Target(), pixel.IM.Moved(PVec(pos)), col)
 }
 
 // DrawImageStretched ...
@@ -269,7 +280,7 @@ func (s *Surface) DrawImageStretched(name string, rect grue.Rect, col color.Colo
 	}
 	rctr := PVec(rect.Center())
 	scv := pixel.V(rect.W()/imsz.X, rect.H()/imsz.Y)
-	im.DrawColorMask(s.target(), pixel.IM.Moved(rctr).ScaledXY(rctr, scv), col)
+	im.DrawColorMask(s.Target(), pixel.IM.Moved(rctr).ScaledXY(rctr, scv), col)
 }
 
 // DrawImageAligned ...
@@ -283,7 +294,7 @@ func (s *Surface) DrawImageAligned(name string, rect grue.Rect, al grue.Align, c
 		return
 	}
 	pos := grue.Rect{Max: imsz}.AlignToRect(rect, al)
-	im.DrawColorMask(s.target(), pixel.IM.Moved(PVec(pos)), col)
+	im.DrawColorMask(s.Target(), pixel.IM.Moved(PVec(pos)), col)
 }
 
 // DrawTooltip ...
@@ -340,6 +351,16 @@ func (s *Surface) JustPressed(button grue.Button) bool {
 // JustReleased getter.
 func (s *Surface) JustReleased(button grue.Button) bool {
 	return s.Window.JustReleased(pixelgl.Button(button))
+}
+
+// KeysInput ...
+func (s *Surface) KeysInput() string {
+	return s.Window.Typed()
+}
+
+// Repeated ...
+func (s *Surface) Repeated(button grue.Button) bool {
+	return s.Window.Repeated(pixelgl.Button(button))
 }
 
 // MouseScroll getter.
@@ -445,4 +466,9 @@ func (s *Surface) SetTheme(theme grue.Theme) {
 // GetTheme ...
 func (s *Surface) GetTheme() *grue.Theme {
 	return &s.Window.theme
+}
+
+// Pulse ...
+func (s *Surface) Pulse(dur float64) float64 {
+	return math.Abs(math.Sin(s.Window.totalTime * math.Pi / dur))
 }

@@ -18,6 +18,7 @@ func NewLight(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 		TooltipFont:       "light-title",
 		TextColor:         grue.RGB(0, 0, 0),
 		DisabledTextColor: grue.RGB(0.3, 0.3, 0.3),
+		PlaceholderColor:  grue.RGB(0.8, 0.8, 0.8),
 		TooltipColor:      grue.RGB(0, 0, 0),
 		Pad:               8,
 		Drawers: map[grue.ThemeDrawerKey]grue.ThemeDrawer{
@@ -46,11 +47,20 @@ func NewLight(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 				ImagePrefix: "light-bt-act",
 				Color:       grue.RGB(0.8, 1, 1),
 			},
+			grue.ThemeLineEdit: grue.TexturedPanel{
+				ImagePrefix: "light-le",
+			},
 			grue.ThemeTooltip: grue.PlainRect{
 				BackColor:   grue.RGB(1, 0.95, 0.8),
 				BorderColor: grue.RGB(0, 0, 0),
 				BorderSize:  1,
 			},
+		},
+		CursorDrawer: grue.RectCursorDrawer{
+			Color1:        grue.RGB(0, 0, 0),
+			Color2:        grue.RGBA(0, 0, 0, 0),
+			Width:         2,
+			PulseInterval: 1,
 		},
 	}
 

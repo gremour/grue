@@ -22,7 +22,6 @@ go run ./cmd/example
 
 ## Basic functionality TODO
 
-- Line edit;
 - Checkbutton;
 - Pixel precise drawing (flooring float values);
 - Clipping & tiling support for backgrounds;

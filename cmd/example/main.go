@@ -48,14 +48,24 @@ func runUI() {
 
 	// Create toplevel panel.
 	pn := grue.NewPanel(s.Root(), grue.Base{
-		Rect: grue.R(20, 20, 480, 280),
+		Rect: grue.R(20, 20, 480, 380),
 	})
 
 	pn1 := grue.NewPanel(pn, grue.Base{
-		Rect: grue.R0(250, 100),
+		Rect: grue.R0(250, 200),
 		Text: ":)",
 	})
 	pn1.Place(grue.V(50, 120))
+
+	le := grue.NewLineEdit(pn1, grue.Base{
+		Rect:            grue.R0(230, 40),
+		PlaceholderText: "placeholder",
+		//		Text: "hi",
+	})
+	le.OnTextChanged = func() {
+		pn1.Text = le.Text
+	}
+	le.Place(grue.V(10, 10))
 
 	bt1 := grue.NewPushButton(pn, grue.Base{
 		Rect: grue.R0(120, 40),

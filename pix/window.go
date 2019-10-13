@@ -14,6 +14,7 @@ import (
 type Window struct {
 	*pixelgl.Window
 	surfaces []*Surface
+	focus    grue.Widget
 
 	frameTime float64
 	totalTime float64
@@ -49,6 +50,7 @@ func (w *Window) Run() {
 			w.JustPressed(pixelgl.MouseButtonRight) ||
 			w.JustPressed(pixelgl.MouseButtonMiddle)
 
+		keyConsumed := false
 		for _, s := range w.surfaces {
 			s.updateMousePos(GVec(w.MousePosition()), click)
 			if s.root != nil {
@@ -63,7 +65,14 @@ func (w *Window) Run() {
 					s.PopDownTo(nil)
 				} else {
 					s.root.ProcessMouse(wu)
-					s.root.ProcessKeys()
+					if !keyConsumed {
+						if s.Focus() != nil && s.Focus().GetPanel().OnKeys != nil {
+							keyConsumed = s.Focus().GetPanel().OnKeys()
+						}
+						if !keyConsumed {
+							s.root.ProcessKeys()
+						}
+					}
 				}
 				s.root.Render()
 			}

@@ -7,18 +7,15 @@ import (
 
 // Base is collection of initializable fields for widget.
 type Base struct {
-	Theme      *Theme
-	Rect       Rect
-	Text       string
-	TextAlign  Align
-	Tooltip    string
-	Disabled   bool
-	Image      string
-	ImageAlign Align
-
-	// If true, widget is invisible (but children are).
-	// OnDraw is still called and can paint.
-	Phantom bool
+	Theme           *Theme
+	Rect            Rect
+	Text            string
+	TextAlign       Align
+	Tooltip         string
+	Disabled        bool
+	Image           string
+	ImageAlign      Align
+	PlaceholderText string
 }
 
 // Panel is simple widget with background color and border.
@@ -103,56 +100,52 @@ func (p *Panel) MyTheme() *Theme {
 
 // Paint draws panel without children.
 func (p *Panel) Paint() {
-	if !p.Phantom {
-		r := p.GlobalRect()
-		theme := p.MyTheme()
-		tdef, _ := theme.Drawers[ThemePanel]
-		var tcur ThemeDrawer
-		tcol := theme.TextColor
-		switch {
-		case p.Disabled:
-			tcur, _ = theme.Drawers[ThemePanelDisabled]
-			tcol = theme.DisabledTextColor
-		}
-		if tcur != nil {
-			tdef = tcur
-		}
-		if tdef != nil {
-			tdef.Draw(p.Surface, r)
-		}
-		p.DrawImageAndText(tcol)
+	r := p.GlobalRect()
+	theme := p.MyTheme()
+	tdef, _ := theme.Drawers[ThemePanel]
+	var tcur ThemeDrawer
+	tcol := theme.TextColor
+	switch {
+	case p.Disabled:
+		tcur, _ = theme.Drawers[ThemePanelDisabled]
+		tcol = theme.DisabledTextColor
 	}
+	if tcur != nil {
+		tdef = tcur
+	}
+	if tdef != nil {
+		tdef.Draw(p.Surface, r)
+	}
+	p.DrawImageAndText(p.Image, p.Text, tcol, p.ImageAlign, p.TextAlign)
 	if p.OnDraw != nil {
 		p.OnDraw()
 	}
 }
 
 // DrawImageAndText draws image and/or text according to alignment.
-func (p *Panel) DrawImageAndText(textColor color.Color) {
+func (p *Panel) DrawImageAndText(image, text string, textColor color.Color, imageAl, textAl Align) {
 	theme := p.MyTheme()
-	imsz, _ := p.Surface.GetImageSize(p.Image)
+	imsz, _ := p.Surface.GetImageSize(image)
 	innerRect := p.GlobalRect().Expanded(-theme.Pad)
 
-	imal := p.ImageAlign
-	if imal == AlignDefault {
-		imal = AlignLeft
+	if imageAl == AlignDefault {
+		imageAl = AlignLeft
 	}
-	p.Surface.DrawImageAligned(p.Image, innerRect, imal, nil)
+	p.Surface.DrawImageAligned(image, innerRect, imageAl, nil)
 	_ = imsz
 
-	txal := p.TextAlign
 	dimg := theme.Pad
-	if p.Image == "" {
+	if image == "" {
 		dimg = 0
 	} else {
-		if p.TextAlign == AlignDefault {
-			txal = AlignLeft
+		if textAl == AlignDefault {
+			textAl = AlignLeft
 		}
 	}
 
 	textRect := innerRect
-	if p.Text != "" {
-		switch p.ImageAlign {
+	if image != "" {
+		switch imageAl {
 		case AlignDefault:
 			fallthrough
 		case AlignTopLeft:
@@ -168,7 +161,9 @@ func (p *Panel) DrawImageAndText(textColor color.Color) {
 		case AlignRight:
 			textRect = innerRect.Extended(0, 0, -imsz.X-dimg, 0)
 		}
-		p.Surface.DrawText(p.Text, theme.TitleFont, textRect, textColor, txal)
+	}
+	if text != "" {
+		p.Surface.DrawText(text, theme.TitleFont, textRect, textColor, textAl)
 	}
 }
 
@@ -221,6 +216,7 @@ func (p *Panel) ProcessMouse(wu Widget) {
 
 	checkPress := func(bt Button) {
 		if p.Surface.JustPressed(bt) {
+			p.Surface.SetFocus(p.Virt)
 			if p.OnMouseDown != nil {
 				p.OnMouseDown(bt)
 			}

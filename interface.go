@@ -16,6 +16,12 @@ type Surface interface {
 	// Get root widget to use as parent to other UI elements
 	Root() Widget
 
+	// Set focus widget
+	SetFocus(Widget)
+
+	// Get focus widget
+	Focus() Widget
+
 	// Set current tooltip
 	SetToolTip(tooltip string)
 
@@ -64,6 +70,8 @@ type Surface interface {
 	ClickMousePos() Vec
 	JustPressed(button Button) bool
 	JustReleased(button Button) bool
+	KeysInput() string
+	Repeated(button Button) bool
 	MouseScroll() Vec
 
 	// Load and init TTF font that will be known under given name
@@ -84,6 +92,9 @@ type Surface interface {
 
 	SetTheme(theme Theme)
 	GetTheme() *Theme
+
+	// Pulse returns pulsating value from 0 to 1 based on time
+	Pulse(dur float64) float64
 }
 
 // Widget is an interface for widgets functionality.
