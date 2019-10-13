@@ -23,7 +23,7 @@ func runUI() {
 	scfg := grue.SurfaceConfig{
 		// Window options
 		Title:          "Grue example",
-		WindowGeometry: grue.R(0, 0, 1000, 600),
+		WindowGeometry: grue.R(0, 0, 500, 400),
 		FPS:            60,
 		// Surface options
 		PixelSize: 1,
