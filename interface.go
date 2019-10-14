@@ -54,6 +54,7 @@ type Surface interface {
 	DrawText(msg, font string, r Rect, col color.Color, al Align)
 
 	GetTextRect(msg, font string) Rect
+	FitText(msg, font string, width float64) string
 
 	// Draws image centered around pos.
 	DrawImage(name string, pos Vec, col color.Color)

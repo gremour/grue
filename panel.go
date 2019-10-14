@@ -163,6 +163,7 @@ func (p *Panel) DrawImageAndText(image, text string, textColor color.Color, imag
 		}
 	}
 	if text != "" {
+		text = p.Surface.FitText(text, theme.TitleFont, textRect.W())
 		p.Surface.DrawText(text, theme.TitleFont, textRect, textColor, textAl)
 	}
 }

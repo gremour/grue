@@ -258,6 +258,22 @@ func (s *Surface) GetTextRect(msg, font string) grue.Rect {
 	return GRect(tsz)
 }
 
+// FitText ...
+func (s *Surface) FitText(msg, font string, width float64) string {
+	if s.GetTextRect(msg, font).W() <= width {
+		return msg
+	}
+	avgSym := s.GetTextRect("a", font).W()
+	avgLen := int(width / avgSym)
+	for s.GetTextRect(msg[:avgLen], font).W() <= width {
+		avgLen++
+	}
+	for s.GetTextRect(msg[:avgLen], font).W() > width {
+		avgLen--
+	}
+	return msg[:avgLen]
+}
+
 // DrawImage ...
 func (s *Surface) DrawImage(name string, pos grue.Vec, col color.Color) {
 	im, err := s.GetImage(name)

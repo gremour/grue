@@ -38,12 +38,21 @@ func (le *LineEdit) Paint() {
 	tcur, _ := theme.Drawers[ThemeLineEdit]
 	tcur.Draw(le.Surface, r)
 	editMode := le.Equals(le.Surface.Focus())
+
+	tcol := theme.TextColor
+	text := le.Text
+	offs := le.TextOffset
+	if le.Text == "" {
+		tcol = theme.PlaceholderColor
+		text = le.PlaceholderText
+		offs = 0
+	}
+	text = le.Surface.FitText(text[offs:], theme.TitleFont, le.Rect.W()-theme.Pad*2)
+	le.DrawImageAndText("", text, tcol, 0, AlignLeft)
+
 	if editMode {
 		curRight := le.cursorPos()
-		le.drawTextTrimmed()
 		theme.CursorDrawer.Draw(le.Surface, r.Min.Add(V(curRight, theme.Pad)), le.Rect.H()-theme.Pad*2)
-	} else {
-		le.drawTextTrimmed()
 	}
 }
 
@@ -140,38 +149,4 @@ func (le *LineEdit) updateTextOffest() {
 		le.TextOffset++
 		curPos = le.cursorPos()
 	}
-}
-
-func (le *LineEdit) drawTextTrimmed() {
-	theme := le.MyTheme()
-
-	tcol := theme.TextColor
-	text := le.Text
-	offs := le.TextOffset
-	if le.Text == "" {
-		tcol = theme.PlaceholderColor
-		text = le.PlaceholderText
-		offs = 0
-	}
-
-	minSymWidth := le.Surface.GetTextRect(" ", theme.TitleFont).W()
-	if minSymWidth == 0 {
-		minSymWidth = 1
-	}
-	maxW := (le.Rect.W() - theme.Pad*2)
-	maxSymCount := int(maxW/minSymWidth) + 1
-	lastSym := le.TextOffset + maxSymCount
-	if lastSym > len(le.Text) {
-		lastSym = len(le.Text)
-	}
-	var txt string
-	for {
-		txt = text[offs:lastSym]
-		if le.Surface.GetTextRect(txt, theme.TitleFont).W() <= maxW ||
-			lastSym <= offs {
-			break
-		}
-		lastSym--
-	}
-	le.DrawImageAndText("", txt, tcol, 0, AlignLeft)
 }
