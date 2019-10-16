@@ -104,7 +104,10 @@ func (p *Panel) Paint() {
 	theme := p.MyTheme()
 	tdef, _ := theme.Drawers[ThemePanel]
 	var tcur ThemeDrawer
-	tcol := theme.TextColor
+	tcol := theme.PanelTextColor
+	if tcol == nil {
+		tcol = theme.TextColor
+	}
 	switch {
 	case p.Disabled:
 		tcur, _ = theme.Drawers[ThemePanelDisabled]
@@ -116,16 +119,16 @@ func (p *Panel) Paint() {
 	if tdef != nil {
 		tdef.Draw(p.Surface, r)
 	}
-	p.DrawImageAndText(p.Image, p.Text, tcol, p.ImageAlign, p.TextAlign)
+	p.DrawImageAndText(p.Image, p.Text, tcol, p.ImageAlign, p.TextAlign, Vec{})
 	if p.OnDraw != nil {
 		p.OnDraw()
 	}
 }
 
 // DrawImageAndText draws image and/or text according to alignment.
-func (p *Panel) DrawImageAndText(image, text string, textColor color.Color, imageAl, textAl Align) {
+func (p *Panel) DrawImageAndText(image, text string, textColor color.Color, imageAl, textAl Align, disp Vec) {
 	theme := p.MyTheme()
-	imsz, _ := p.Surface.GetImageSize(image)
+	imsz := p.Surface.GetImageRect(image).Size()
 	innerRect := p.GlobalRect().Expanded(-theme.Pad)
 
 	if imageAl == AlignDefault {
@@ -164,7 +167,7 @@ func (p *Panel) DrawImageAndText(image, text string, textColor color.Color, imag
 	}
 	if text != "" {
 		text = p.Surface.FitText(text, theme.TitleFont, textRect.W())
-		p.Surface.DrawText(text, theme.TitleFont, textRect, textColor, textAl)
+		p.Surface.DrawText(text, theme.TitleFont, textRect.Moved(disp), textColor, textAl)
 	}
 }
 

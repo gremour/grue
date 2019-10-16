@@ -59,8 +59,12 @@ type Surface interface {
 	// Draws image centered around pos.
 	DrawImage(name string, pos Vec, col color.Color)
 
-	// Draws image aligned relative to rect.
+	// Draws image aligned relative to alrect.
 	DrawImageAligned(name string, rect Rect, al Align, col color.Color)
+
+	// Draws image part into dst rect. Part Min should be zero,
+	// i.e relative to image (it's moved to actual image rect).
+	DrawImagePart(name string, part, dst Rect, col color.Color)
 
 	// Draw image into target rectangle.
 	DrawImageStretched(name string, rect Rect, col color.Color)
@@ -81,8 +85,11 @@ type Surface interface {
 	// Load and init images from sheet described by JSON file
 	InitImages(configFileName string) error
 
-	// Get size of the previously loaded image
-	GetImageSize(name string) (Vec, error)
+	// Get rectangle of the previously loaded image.
+	// Rectangle corresponds to image coordinates in sheet.
+	// If you need only the size, call GetImageRect().Size().
+	// If image doesn't exists, returns zero rect.
+	GetImageRect(name string) Rect
 
 	// Init images from sheet described by config structure.
 	// Images will be named as described in configuration.
@@ -91,7 +98,7 @@ type Surface interface {
 	// you may want to use InitImages method.
 	InitImageSheets(config ImageSheetConfig) error
 
-	SetTheme(theme Theme)
+	SetTheme(theme *Theme)
 	GetTheme() *Theme
 
 	// Pulse returns pulsating value from 0 to 1 based on time

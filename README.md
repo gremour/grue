@@ -14,6 +14,10 @@ after basic functionality is implemented (v0.1.0+).
 
 <p align="center"><img src="assets/demo.gif"></p>
 
+## Example of textured theme
+
+<p align="center"><img src="assets/shot_stone.png"></p>
+
 ## Running example
 
 ```bash
@@ -22,14 +26,13 @@ go run ./cmd/example
 
 ## Basic functionality TODO
 
-- Checkbutton;
-- Pixel precise drawing (flooring float values);
-- Clipping & tiling support for backgrounds;
-- Layout helper;
-- Charsets for fonts (currently only ASCII is supported);
-- Pixel fonts (with supplied font atlas);
-- Using 3rd party geometry lib;
-- More window options (fullscreen, etc).
+- [ ] Checkbutton;
+- [?] Pixel precise drawing (flooring float values);
+- [ ] Widgets layout helper;
+- [ ] Charsets for fonts (currently only ASCII is supported);
+- [ ] Pixel fonts (with supplied font atlas);
+- [?] Using 3rd party geometry lib;
+- [ ] More window options (fullscreen, etc).
 
 # UI features
 

@@ -23,7 +23,7 @@ type Window struct {
 	fonts   map[string]*text.Atlas
 	sprites map[string]*pixel.Sprite
 
-	theme grue.Theme
+	theme *grue.Theme
 }
 
 func newWindow(win *pixelgl.Window, fps int) *Window {
@@ -37,6 +37,9 @@ func newWindow(win *pixelgl.Window, fps int) *Window {
 
 // Run the main loop.
 func (w *Window) Run() {
+	if w.theme == nil {
+		panic("Theme isn't set! Set a theme with Surface.SetTheme")
+	}
 	var fps <-chan time.Time
 	if w.fps != 0 {
 		fps = time.Tick(time.Second / time.Duration(w.fps))

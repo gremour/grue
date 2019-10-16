@@ -40,6 +40,10 @@ func runUI() {
 	if err != nil {
 		panic(err)
 	}
+	// _, err = themes.NewStone(s, "assets/caladea-bold.ttf", 20, "assets/theme-stone.json")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	err = s.InitImages("assets/images.json")
 	if err != nil {
@@ -60,7 +64,6 @@ func runUI() {
 	le := grue.NewLineEdit(pn1, grue.Base{
 		Rect:            grue.R0(230, 40),
 		PlaceholderText: "placeholder",
-		//		Text: "hi",
 	})
 	le.OnTextChanged = func() {
 		pn1.Text = le.Text

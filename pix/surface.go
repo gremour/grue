@@ -289,7 +289,7 @@ func (s *Surface) DrawImageStretched(name string, rect grue.Rect, col color.Colo
 	if err != nil {
 		return
 	}
-	imsz, _ := s.GetImageSize(name)
+	imsz := s.GetImageRect(name).Size()
 	if imsz.X == 0 ||
 		imsz.Y == 0 {
 		return
@@ -300,17 +300,32 @@ func (s *Surface) DrawImageStretched(name string, rect grue.Rect, col color.Colo
 }
 
 // DrawImageAligned ...
-func (s *Surface) DrawImageAligned(name string, rect grue.Rect, al grue.Align, col color.Color) {
+func (s *Surface) DrawImageAligned(name string, alrect grue.Rect, al grue.Align, col color.Color) {
 	im, err := s.GetImage(name)
 	if err != nil {
 		return
 	}
-	imsz, err := s.GetImageSize(name)
+	imsz := s.GetImageRect(name).Size()
+	pos := grue.Rect{Max: imsz}.AlignToRect(alrect, al)
+	im.DrawColorMask(s.Target(), pixel.IM.Moved(PVec(pos)), col)
+}
+
+// DrawImagePart ...
+func (s *Surface) DrawImagePart(name string, part, rect grue.Rect, col color.Color) {
+	if part.W() == 0 || part.H() == 0 {
+		return
+	}
+	im, err := s.GetImage(name)
 	if err != nil {
 		return
 	}
-	pos := grue.Rect{Max: imsz}.AlignToRect(rect, al)
-	im.DrawColorMask(s.Target(), pixel.IM.Moved(PVec(pos)), col)
+	pic := im.Picture()
+	imf := im.Frame()
+	im.Set(pic, PRect(part).Moved(imf.Min))
+	rctr := PVec(rect.Center())
+	scv := pixel.V(rect.W()/part.W(), rect.H()/part.H())
+	im.DrawColorMask(s.Target(), pixel.IM.Moved(rctr).ScaledXY(rctr, scv), col)
+	im.Set(pic, imf)
 }
 
 // DrawTooltip ...
@@ -456,13 +471,13 @@ func (s *Surface) InitImages(configFileName string) error {
 	return err
 }
 
-// GetImageSize ...
-func (s *Surface) GetImageSize(name string) (grue.Vec, error) {
+// GetImageRect ...
+func (s *Surface) GetImageRect(name string) grue.Rect {
 	im, err := s.GetImage(name)
 	if err != nil {
-		return grue.Vec{}, err
+		return grue.Rect{}
 	}
-	return GRect(im.Frame()).Size(), nil
+	return GRect(im.Frame())
 }
 
 // GetImage ...
@@ -475,13 +490,13 @@ func (s *Surface) GetImage(name string) (*pixel.Sprite, error) {
 }
 
 // SetTheme ...
-func (s *Surface) SetTheme(theme grue.Theme) {
+func (s *Surface) SetTheme(theme *grue.Theme) {
 	s.Window.theme = theme
 }
 
 // GetTheme ...
 func (s *Surface) GetTheme() *grue.Theme {
-	return &s.Window.theme
+	return s.Window.theme
 }
 
 // Pulse ...

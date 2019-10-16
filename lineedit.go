@@ -39,16 +39,22 @@ func (le *LineEdit) Paint() {
 	tcur.Draw(le.Surface, r)
 	editMode := le.Equals(le.Surface.Focus())
 
-	tcol := theme.TextColor
+	tcol := theme.EditTextColor
+	if tcol == nil {
+		tcol = theme.TextColor
+	}
 	text := le.Text
 	offs := le.TextOffset
 	if le.Text == "" {
 		tcol = theme.PlaceholderColor
+		if tcol == nil {
+			tcol = theme.TextColor
+		}
 		text = le.PlaceholderText
 		offs = 0
 	}
 	text = le.Surface.FitText(text[offs:], theme.TitleFont, le.Rect.W()-theme.Pad*2)
-	le.DrawImageAndText("", text, tcol, 0, AlignLeft)
+	le.DrawImageAndText("", text, tcol, 0, AlignLeft, Vec{})
 
 	if editMode {
 		curRight := le.cursorPos()

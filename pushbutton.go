@@ -42,13 +42,18 @@ func (pb *PushButton) Paint() {
 	theme := pb.MyTheme()
 	tdef, _ := theme.Drawers[ThemeButton]
 	var tcur ThemeDrawer
-	tcol := theme.TextColor
+	tcol := theme.ButtonTextColor
+	if tcol == nil {
+		tcol = theme.TextColor
+	}
+	var disp Vec
 	switch {
 	case pb.Disabled:
 		tcur, _ = theme.Drawers[ThemeButtonDisabled]
 		tcol = theme.DisabledTextColor
 	case pb.Pressed:
 		tcur, _ = theme.Drawers[ThemeButtonActive]
+		disp = theme.PressDisplace
 	case pb.PointerInside:
 		tcur, _ = theme.Drawers[ThemeButtonHL]
 	}
@@ -58,5 +63,5 @@ func (pb *PushButton) Paint() {
 	if tdef != nil {
 		tdef.Draw(pb.Surface, r)
 	}
-	pb.DrawImageAndText(pb.Image, pb.Text, tcol, pb.ImageAlign, pb.TextAlign)
+	pb.DrawImageAndText(pb.Image, pb.Text, tcol, pb.ImageAlign, pb.TextAlign, disp)
 }
