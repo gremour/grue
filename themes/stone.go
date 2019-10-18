@@ -13,6 +13,37 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 		return grue.Theme{}, err
 	}
 
+	pnmd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
+		grue.TexturedPanel{
+			Image:          "stone-pn",
+			TileHorizontal: true, TileVertical: true,
+		},
+		// grue.TexturedPanel{
+		// 	Image: "stone-orn3",
+		// 	Left:  6, Right: 6, Top: 6, Bottom: 6,
+		// },
+	}}
+	btmd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
+		grue.TexturedPanel{
+			Image:          "stone-bt",
+			TileHorizontal: true, TileVertical: true,
+		},
+		grue.TexturedPanel{
+			Image: "stone-orn2",
+			Left:  4, Right: 4, Top: 4, Bottom: 4,
+		},
+	}}
+	lemd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
+		grue.TexturedPanel{
+			Image:          "stone-le",
+			TileHorizontal: true, TileVertical: true,
+		},
+		// grue.TexturedPanel{
+		// 	Image: "stone-orn1",
+		// 	Left:  6, Right: 6, Top: 6, Bottom: 6,
+		// },
+	}}
+
 	theme := grue.Theme{
 		TitleFont:         "stone-title",
 		TooltipFont:       "stone-title",
@@ -25,50 +56,13 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 		Pad:               8,
 		PressDisplace:     grue.V(1, -1),
 		Drawers: map[grue.ThemeDrawerKey]grue.ThemeDrawer{
-			grue.ThemePanel: grue.TexturedPanel{
-				Image: "stone-pn",
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemePanelDisabled: grue.TexturedPanel{
-				Image: "stone-pn",
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemeButton: grue.TexturedPanel{
-				Image: "stone-bt",
-				Color: grue.RGB(0.9, 0.9, 0.9),
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemeButtonDisabled: grue.TexturedPanel{
-				Image: "stone-bt",
-				Color: grue.RGB(0.9, 0.9, 0.9),
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemeButtonHL: grue.TexturedPanel{
-				Image: "stone-bt",
-				Color: grue.RGB(0.9, 0.9, 0.9),
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemeButtonActive: grue.TexturedPanel{
-				Image: "stone-bt-act",
-				Color: grue.RGB(0.8, 1, 1),
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-			},
-			grue.ThemeLineEdit: grue.TexturedPanel{
-				Image: "stone-bt",
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				Color: grue.RGB(0.8, 0.8, 1),
-			},
-			grue.ThemeTooltip: grue.TexturedPanel{
-				Image: "stone-pn",
-				Left:  2, Right: 2, Top: 2, Bottom: 2,
-				TileHorizontal: true, TileVertical: true,
-				Color: grue.RGB(1, 0.95, 0.8),
+			grue.ThemePanel:    pnmd,
+			grue.ThemeButton:   btmd,
+			grue.ThemeLineEdit: lemd,
+			grue.ThemeTooltip: grue.PlainRect{
+				BackColor:   grue.RGB(1, 0.95, 0.8),
+				BorderColor: grue.RGB(0, 0, 0),
+				BorderSize:  1,
 			},
 		},
 		CursorDrawer: grue.RectCursorDrawer{

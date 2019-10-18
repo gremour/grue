@@ -36,14 +36,14 @@ func runUI() {
 		panic(err)
 	}
 
-	_, err = themes.NewLight(s, "assets/caladea-bold.ttf", 20, "assets/theme-light.json")
-	if err != nil {
-		panic(err)
-	}
-	// _, err = themes.NewStone(s, "assets/caladea-bold.ttf", 20, "assets/theme-stone.json")
+	// _, err = themes.NewLight(s, "assets/caladea-bold.ttf", 20, "assets/theme-light.json")
 	// if err != nil {
 	// 	panic(err)
 	// }
+	_, err = themes.NewStone(s, "assets/caladea-bold.ttf", 20, "assets/theme-stone.json")
+	if err != nil {
+		panic(err)
+	}
 
 	err = s.InitImages("assets/images.json")
 	if err != nil {

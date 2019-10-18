@@ -43,15 +43,30 @@ type ThemeDrawer interface {
 type ThemeDrawerKey string
 
 const (
-	ThemePanel          ThemeDrawerKey = "p"
-	ThemePanelDisabled  ThemeDrawerKey = "p-d"
-	ThemeButton         ThemeDrawerKey = "b"
-	ThemeButtonDisabled ThemeDrawerKey = "b-d"
-	ThemeButtonHL       ThemeDrawerKey = "b-h"
-	ThemeButtonActive   ThemeDrawerKey = "b-a"
-	ThemeLineEdit       ThemeDrawerKey = "le"
-	ThemeTooltip        ThemeDrawerKey = "tip"
+	ThemePanel            ThemeDrawerKey = "p"
+	ThemePanelDisabled    ThemeDrawerKey = "p-d"
+	ThemeButton           ThemeDrawerKey = "b"
+	ThemeButtonDisabled   ThemeDrawerKey = "b-d"
+	ThemeButtonHL         ThemeDrawerKey = "b-h"
+	ThemeButtonActive     ThemeDrawerKey = "b-a"
+	ThemeLineEdit         ThemeDrawerKey = "le"
+	ThemeLineEditDisabled ThemeDrawerKey = "le-d"
+	ThemeLineEditHL       ThemeDrawerKey = "le-h"
+	ThemeLineEditActive   ThemeDrawerKey = "le-a"
+	ThemeTooltip          ThemeDrawerKey = "tip"
 )
+
+// MultiDrawer is a drawer combining several other drawers.
+type MultiDrawer struct {
+	Drawers []ThemeDrawer
+}
+
+// Draw ...
+func (md MultiDrawer) Draw(s Surface, rect Rect) {
+	for _, d := range md.Drawers {
+		d.Draw(s, rect)
+	}
+}
 
 // TexturedPanel contains info needed to draw texturized
 // panel of arbitrary size. Panel consists of parts

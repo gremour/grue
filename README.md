@@ -27,12 +27,12 @@ go run ./cmd/example
 ## Basic functionality TODO
 
 - [ ] Checkbutton;
-- [?] Pixel precise drawing (flooring float values);
 - [ ] Widgets layout helper;
 - [ ] Charsets for fonts (currently only ASCII is supported);
 - [ ] Pixel fonts (with supplied font atlas);
-- [?] Using 3rd party geometry lib;
 - [ ] More window options (fullscreen, etc).
+- [ ] ?Using 3rd party geometry lib;
+- [ ] ?Pixel precise drawing (flooring float values);
 
 # UI features
 

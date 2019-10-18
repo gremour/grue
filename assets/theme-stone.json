@@ -1,19 +1,26 @@
 {
-    "file": "marbles.png",
+    "file": "theme-stone.png",
     "sheets": [
         {
             "x_offset": 0,
             "y_offset": 0,
-            "width": 300,
-            "height": 40,
-            "names": ["stone-bt", "stone-bt-act"]
+            "width": 512,
+            "height": 512,
+            "names": ["stone-pn"]
         },
         {
             "x_offset": 0,
-            "y_offset": 40,
-            "width": 600,
-            "height": 600,
-            "names": ["stone-pn"]
+            "y_offset": 512,
+            "width": 256,
+            "height": 32,
+            "names": ["stone-bt", "stone-le"]
+        },
+        {
+            "x_offset": 0,
+            "y_offset": 544,
+            "width": 64,
+            "height": 64,
+            "names": ["stone-orn1", "stone-orn2", "stone-glow1", "stone-glow2", "stone-orn3" ]
         }
     ]
 }

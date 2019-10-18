@@ -265,10 +265,13 @@ func (s *Surface) FitText(msg, font string, width float64) string {
 	}
 	avgSym := s.GetTextRect("a", font).W()
 	avgLen := int(width / avgSym)
-	for s.GetTextRect(msg[:avgLen], font).W() <= width {
+	if avgLen > len(msg) {
+		avgLen = len(msg)
+	}
+	for avgLen < len(msg)-1 && s.GetTextRect(msg[:avgLen], font).W() <= width {
 		avgLen++
 	}
-	for s.GetTextRect(msg[:avgLen], font).W() > width {
+	for avgLen > 0 && s.GetTextRect(msg[:avgLen], font).W() > width {
 		avgLen--
 	}
 	return msg[:avgLen]

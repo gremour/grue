@@ -33,16 +33,31 @@ func NewLineEdit(parent Widget, b Base) *LineEdit {
 
 // Paint draws the widget without children.
 func (le *LineEdit) Paint() {
+	editMode := le.Equals(le.Surface.Focus()) && !le.Disabled
 	r := le.GlobalRect()
 	theme := le.MyTheme()
-	tcur, _ := theme.Drawers[ThemeLineEdit]
-	tcur.Draw(le.Surface, r)
-	editMode := le.Equals(le.Surface.Focus())
-
+	tdef, _ := theme.Drawers[ThemeLineEdit]
 	tcol := theme.EditTextColor
 	if tcol == nil {
 		tcol = theme.TextColor
 	}
+	var tcur ThemeDrawer
+	switch {
+	case le.Disabled:
+		tcur, _ = theme.Drawers[ThemeLineEditDisabled]
+		tcol = theme.DisabledTextColor
+	case editMode:
+		tcur, _ = theme.Drawers[ThemeLineEditActive]
+	case le.PointerInside:
+		tcur, _ = theme.Drawers[ThemeLineEditHL]
+	}
+	if tcur != nil {
+		tdef = tcur
+	}
+	if tdef != nil {
+		tdef.Draw(le.Surface, r)
+	}
+
 	text := le.Text
 	offs := le.TextOffset
 	if le.Text == "" {
