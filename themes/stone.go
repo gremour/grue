@@ -18,10 +18,10 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 			Image:          "stone-pn",
 			TileHorizontal: true, TileVertical: true,
 		},
-		// grue.TexturedPanel{
-		// 	Image: "stone-orn3",
-		// 	Left:  6, Right: 6, Top: 6, Bottom: 6,
-		// },
+		grue.TexturedPanel{
+			Image: "stone-orn3",
+			Left:  10, Right: 10, Top: 10, Bottom: 10,
+		},
 	}}
 	btmd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
 		grue.TexturedPanel{
@@ -33,15 +33,28 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 			Left:  4, Right: 4, Top: 4, Bottom: 4,
 		},
 	}}
+	btmda := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
+		grue.TexturedPanel{
+			Image:          "stone-bt",
+			TileHorizontal: true, TileVertical: true,
+			Color: grue.RGB(0.7, 0.7, 0.7),
+		},
+		grue.TexturedPanel{
+			Image: "stone-orn2",
+			Left:  4, Right: 4, Top: 4, Bottom: 4,
+			Color: grue.RGB(0.7, 0.7, 0.7),
+		},
+	}}
 	lemd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
 		grue.TexturedPanel{
 			Image:          "stone-le",
 			TileHorizontal: true, TileVertical: true,
+			Left: 6, Right: 6, Top: 6, Bottom: 6,
 		},
-		// grue.TexturedPanel{
-		// 	Image: "stone-orn1",
-		// 	Left:  6, Right: 6, Top: 6, Bottom: 6,
-		// },
+		grue.TexturedPanel{
+			Image: "stone-orn2",
+			Left:  6, Right: 6, Top: 6, Bottom: 6,
+		},
 	}}
 
 	theme := grue.Theme{
@@ -54,11 +67,12 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 		PlaceholderColor:  grue.RGB(0.7, 0.7, 0.7),
 		TooltipColor:      grue.RGB(0, 0, 0),
 		Pad:               8,
-		PressDisplace:     grue.V(1, -1),
+		//		PressDisplace:     grue.V(1, -1),
 		Drawers: map[grue.ThemeDrawerKey]grue.ThemeDrawer{
-			grue.ThemePanel:    pnmd,
-			grue.ThemeButton:   btmd,
-			grue.ThemeLineEdit: lemd,
+			grue.ThemePanel:        pnmd,
+			grue.ThemeButton:       btmd,
+			grue.ThemeButtonActive: btmda,
+			grue.ThemeLineEdit:     lemd,
 			grue.ThemeTooltip: grue.PlainRect{
 				BackColor:   grue.RGB(1, 0.95, 0.8),
 				BorderColor: grue.RGB(0, 0, 0),

@@ -12,12 +12,12 @@
             "x_offset": 0,
             "y_offset": 512,
             "width": 256,
-            "height": 32,
+            "height": 64,
             "names": ["stone-bt", "stone-le"]
         },
         {
             "x_offset": 0,
-            "y_offset": 544,
+            "y_offset": 576,
             "width": 64,
             "height": 64,
             "names": ["stone-orn1", "stone-orn2", "stone-glow1", "stone-glow2", "stone-orn3" ]

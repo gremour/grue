@@ -18,7 +18,7 @@ type Base struct {
 	PlaceholderText string
 }
 
-// Panel is simple widget with background color and border.
+// Panel is a simple widget with background color and border.
 // It can contain text and/or image.
 type Panel struct {
 	Parent   Widget
