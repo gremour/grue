@@ -33,7 +33,7 @@ go run ./cmd/example
 - [ ] Charsets for fonts (currently only ASCII is supported);
 - [ ] Pixel fonts (with supplied font atlas);
 - [ ] More window options (fullscreen, etc).
-- [ ] Using 3rd party geometry lib (or split grue/geometry to new repo);
+- [ ] Use 3rd party geometry lib (or split grue/geometry to new repo);
 
 # UI features
 
@@ -55,6 +55,8 @@ DrawText function references font just by it's name;
 configuration JSON files; they are also referenced by sprite names.
 Images are to used as icons and widget backgrounds, as well, as just
 drawn at surfaces.
+- [x] **Particles** -- Flexible particles system (allowing writing custom particle 
+generators) to create effects; particles can be used in theme drawers.
 
 Note: Grue currently uses same coordinate system as OpenGL: 0, 0 is at left bottom of the window.
 That is different from most UI libs, which have 0, 0 at left top of the window.
