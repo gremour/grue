@@ -20,7 +20,14 @@
             "y_offset": 576,
             "width": 64,
             "height": 64,
-            "names": ["stone-orn1", "stone-orn2", "stone-glow1", "stone-glow2", "stone-orn3" ]
+            "names": ["stone-orn1", "stone-orn2", "stone-glow1", "stone-glow2", "stone-orn3"]
+        },
+        {
+            "x_offset": 496,
+            "y_offset": 576,
+            "width": 16,
+            "height": 16,
+            "names": ["ptc-star"]
         }
     ]
 }

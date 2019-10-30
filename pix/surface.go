@@ -506,3 +506,13 @@ func (s *Surface) GetTheme() *grue.Theme {
 func (s *Surface) Pulse(dur float64) float64 {
 	return math.Abs(math.Sin(s.Window.totalTime * math.Pi / dur))
 }
+
+// FrameTime ...
+func (s *Surface) FrameTime() float64 {
+	return s.Window.frameTime
+}
+
+// TotalTime ...
+func (s *Surface) TotalTime() float64 {
+	return s.Window.totalTime
+}

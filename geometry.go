@@ -101,6 +101,16 @@ func (r Rect) Moved(delta Vec) Rect {
 	}
 }
 
+// SetCenter returns the Rect center moved to provided pos.
+func (r Rect) SetCenter(pos Vec) Rect {
+	w2 := r.W()
+	h2 := r.H()
+	return Rect{
+		Min: V(pos.X-w2, pos.Y-h2),
+		Max: V(pos.X+w2, pos.Y+h2),
+	}
+}
+
 // Contains checks whether a vector u is contained within this Rect (including it's borders).
 func (r Rect) Contains(u Vec) bool {
 	return r.Min.X <= u.X && u.X <= r.Max.X && r.Min.Y <= u.Y && u.Y <= r.Max.Y

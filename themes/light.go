@@ -22,46 +22,46 @@ func NewLight(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 		TooltipColor:      grue.RGB(0, 0, 0),
 		Pad:               8,
 		Drawers: map[grue.ThemeDrawerKey]grue.ThemeDrawer{
-			grue.ThemePanel: grue.PlainRect{
+			grue.ThemePanel: PlainRect{
 				BackColor:   grue.RGB(0.7, 0.7, 0.7),
 				BorderColor: grue.RGB(0.4, 0.4, 0.4),
 				BorderSize:  1,
 			},
-			grue.ThemePanelDisabled: grue.PlainRect{
+			grue.ThemePanelDisabled: PlainRect{
 				BackColor:   grue.RGB(0.5, 0.5, 0.5),
 				BorderColor: grue.RGB(0.3, 0.3, 0.3),
 				BorderSize:  1,
 			},
-			grue.ThemeButton: grue.TexturedPanel{
+			grue.ThemeButton: TexturedPanel{
 				Image: "light-bt",
 				Left:  4, Right: 4, Top: 4, Bottom: 4,
 			},
-			grue.ThemeButtonDisabled: grue.TexturedPanel{
+			grue.ThemeButtonDisabled: TexturedPanel{
 				Image: "light-bt",
 				Color: grue.RGB(0.8, 0.8, 0.8),
 				Left:  4, Right: 4, Top: 4, Bottom: 4,
 			},
-			grue.ThemeButtonHL: grue.TexturedPanel{
+			grue.ThemeButtonHL: TexturedPanel{
 				Image: "light-bt",
 				Color: grue.RGB(0.8, 1, 1),
 				Left:  4, Right: 4, Top: 4, Bottom: 4,
 			},
-			grue.ThemeButtonActive: grue.TexturedPanel{
+			grue.ThemeButtonActive: TexturedPanel{
 				Image: "light-bt-act",
 				Color: grue.RGB(0.8, 1, 1),
 				Left:  4, Right: 4, Top: 4, Bottom: 4,
 			},
-			grue.ThemeLineEdit: grue.TexturedPanel{
+			grue.ThemeLineEdit: TexturedPanel{
 				Image: "light-le",
 				Left:  4, Right: 4, Top: 4, Bottom: 4,
 			},
-			grue.ThemeTooltip: grue.PlainRect{
+			grue.ThemeTooltip: PlainRect{
 				BackColor:   grue.RGB(1, 0.95, 0.8),
 				BorderColor: grue.RGB(0, 0, 0),
 				BorderSize:  1,
 			},
 		},
-		CursorDrawer: grue.RectCursorDrawer{
+		CursorDrawer: RectCursorDrawer{
 			Color1:        grue.RGB(0, 0, 0),
 			Color2:        grue.RGBA(0, 0, 0, 0),
 			Width:         2,

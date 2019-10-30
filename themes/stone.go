@@ -14,48 +14,52 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 	}
 
 	pnmd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image:          "stone-pn",
 			TileHorizontal: true, TileVertical: true,
 		},
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image: "stone-orn3",
 			Left:  10, Right: 10, Top: 10, Bottom: 10,
 		},
 	}}
 	btmd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image:          "stone-bt",
 			TileHorizontal: true, TileVertical: true,
 		},
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image: "stone-orn2",
 			Left:  4, Right: 4, Top: 4, Bottom: 4,
 		},
 	}}
 	btmda := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image:          "stone-bt",
 			TileHorizontal: true, TileVertical: true,
 			Color: grue.RGB(0.7, 0.7, 0.7),
 		},
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image: "stone-orn2",
 			Left:  4, Right: 4, Top: 4, Bottom: 4,
 			Color: grue.RGB(0.7, 0.7, 0.7),
 		},
 	}}
+	btmdhl := btmd
+	btmdhl.Drawers = append(btmdhl.Drawers, ParticleDrawer{})
 	lemd := grue.MultiDrawer{Drawers: []grue.ThemeDrawer{
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image:          "stone-le",
 			TileHorizontal: true, TileVertical: true,
 			Left: 6, Right: 6, Top: 6, Bottom: 6,
 		},
-		grue.TexturedPanel{
+		TexturedPanel{
 			Image: "stone-orn2",
 			Left:  6, Right: 6, Top: 6, Bottom: 6,
 		},
 	}}
+	lemdhl := lemd
+	lemdhl.Drawers = append(lemdhl.Drawers, ParticleDrawer{})
 
 	theme := grue.Theme{
 		TitleFont:         "stone-title",
@@ -72,14 +76,16 @@ func NewStone(s grue.Surface, fontFile string, fontSize float64, sheetFile strin
 			grue.ThemePanel:        pnmd,
 			grue.ThemeButton:       btmd,
 			grue.ThemeButtonActive: btmda,
+			grue.ThemeButtonHL:     btmdhl,
 			grue.ThemeLineEdit:     lemd,
-			grue.ThemeTooltip: grue.PlainRect{
+			grue.ThemeLineEditHL:   lemdhl,
+			grue.ThemeTooltip: PlainRect{
 				BackColor:   grue.RGB(1, 0.95, 0.8),
 				BorderColor: grue.RGB(0, 0, 0),
 				BorderSize:  1,
 			},
 		},
-		CursorDrawer: grue.RectCursorDrawer{
+		CursorDrawer: RectCursorDrawer{
 			Color1:        grue.RGB(1, 1, 1),
 			Color2:        grue.RGBA(0, 0, 0, 0),
 			Width:         3,

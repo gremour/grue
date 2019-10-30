@@ -7,7 +7,9 @@ import (
 
 // Base is collection of initializable fields for widget.
 type Base struct {
-	Theme           *Theme
+	Theme *Theme
+	// Extra objects to pass to theme drawers.
+	Extras          []interface{}
 	Rect            Rect
 	Text            string
 	TextAlign       Align
@@ -117,7 +119,7 @@ func (p *Panel) Paint() {
 		tdef = tcur
 	}
 	if tdef != nil {
-		tdef.Draw(p.Surface, r)
+		tdef.Draw(p.Surface, r, p.Extras...)
 	}
 	p.DrawImageAndText(p.Image, p.Text, tcol, p.ImageAlign, p.TextAlign, Vec{})
 	if p.OnDraw != nil {

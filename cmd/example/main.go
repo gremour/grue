@@ -1,7 +1,10 @@
 package main
 
 import (
+	"math"
+
 	"github.com/gremour/grue"
+	"github.com/gremour/grue/particles"
 	"github.com/gremour/grue/pix"
 	"github.com/gremour/grue/themes"
 )
@@ -69,12 +72,14 @@ func runUI() {
 		pn1.Text = le.Text
 	}
 	le.Place(grue.V(10, 10))
+	polish(le.Panel)
 
 	bt1 := grue.NewPushButton(pn, grue.Base{
 		Rect: grue.R0(120, 40),
 		Text: "Hello",
 	})
 	bt1.Place(grue.V(50, 50))
+	polish(bt1.Panel)
 
 	bt2 := grue.NewPushButton(pn, grue.Base{
 		Rect: grue.R0(200, 40),
@@ -86,12 +91,14 @@ func runUI() {
 		// ImageAlign: grue.AlignRight,
 	})
 	bt2.Place(grue.V(180, 50))
+	polish(bt2.Panel)
 
 	bt1.OnPress = func() {
 		btPop := grue.NewPushButton(s.Root(), grue.Base{
 			Rect: grue.R0(120, 40).Moved(s.MousePos()),
 			Text: "Pop",
 		})
+		polish(btPop.Panel)
 		s.PopUp(btPop)
 	}
 
@@ -102,4 +109,26 @@ func runUI() {
 
 	// Run main loop.
 	s.Run()
+}
+
+// btPolish initializes particles generator for button.
+// Particles generator is used in theme if
+// theme has ParticleDrawer.
+func polish(pn *grue.Panel) {
+	pg := &particles.Group{
+		Generator: &particles.GlitterEdge{
+			Rect:           pn.GlobalRect().Expanded(-2),
+			Placer:         particles.BorderPlacer{},
+			Image:          "ptc-star",
+			MaxSize:        4,
+			LifeTime:       1,
+			SpawnTempo:     2,
+			MinParticles:   4,
+			MaxParticles:   16,
+			SizeFunc:       math.Sin,
+			SizeFuncMaxArg: math.Pi,
+			Color:          grue.RGBA(1, 0.85, 0.5, 0.5),
+		},
+	}
+	pn.Extras = []interface{}{pg}
 }

@@ -78,6 +78,9 @@ func (w *Window) Run() {
 					}
 				}
 				s.root.Render()
+				if s.events != nil {
+					s.events()
+				}
 			}
 		}
 
@@ -98,11 +101,6 @@ func (w *Window) Run() {
 			}
 		}
 		w.Update()
-		for _, s := range w.surfaces {
-			if s.events != nil {
-				s.events()
-			}
-		}
 
 		if fps != nil {
 			<-fps

@@ -101,8 +101,14 @@ type Surface interface {
 	SetTheme(theme *Theme)
 	GetTheme() *Theme
 
-	// Pulse returns pulsating value from 0 to 1 based on time
+	// Pulse returns pulsating value from 0 to 1 based on time.
 	Pulse(dur float64) float64
+
+	// FrameTime returns amount of seconds between two latest window updates.
+	FrameTime() float64
+
+	// TotalTime returns amount of seconds from the start.
+	TotalTime() float64
 }
 
 // Widget is an interface for widgets functionality.

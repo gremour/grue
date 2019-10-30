@@ -55,7 +55,7 @@ func (le *LineEdit) Paint() {
 		tdef = tcur
 	}
 	if tdef != nil {
-		tdef.Draw(le.Surface, r)
+		tdef.Draw(le.Surface, r, le.Extras...)
 	}
 
 	text := le.Text
