@@ -27,12 +27,13 @@ go run ./cmd/example
 ## Basic functionality TODO
 
 - [ ] Checkbutton;
+- [ ] Popup menu;
 - [ ] Widgets layout helper;
+- [ ] Drag'n'drop;
 - [ ] Charsets for fonts (currently only ASCII is supported);
 - [ ] Pixel fonts (with supplied font atlas);
 - [ ] More window options (fullscreen, etc).
-- [ ] ?Using 3rd party geometry lib;
-- [ ] ?Pixel precise drawing (flooring float values);
+- [ ] Using 3rd party geometry lib (or split grue/geometry to new repo);
 
 # UI features
 
