@@ -27,7 +27,7 @@ go run ./cmd/example
 ## Basic functionality TODO
 
 - [ ] Checkbutton;
-- [ ] Popup menu;
+- [x] Popup menu;
 - [ ] Widgets layout helper;
 - [ ] Drag'n'drop;
 - [ ] Charsets for fonts (currently only ASCII is supported);
@@ -50,7 +50,7 @@ Widget belongs to a surface;
 - [x] **Theme** -- collection of parameters and functions that define how
 widgets are rendered;
 - [x] **Fonts** -- are loaded and rendered to atlases by pixel with simple InitTTF call;
-DrawText function references font just by it's name;
+DrawText function references font just by its name;
 - [x] Similarly, **Images** are loaded as atlases and formatted to sprites according to
 configuration JSON files; they are also referenced by sprite names.
 Images are to used as icons and widget backgrounds, as well, as just

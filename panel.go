@@ -252,7 +252,11 @@ func (p *Panel) ProcessMouse(wu Widget) {
 		p.OnMouseMove()
 	}
 
-	for _, c := range p.Children {
+	// Make a copy of children because
+	// ProcessMouse may modify array.
+	pch := make([]Widget, len(p.Children))
+	copy(pch, p.Children)
+	for _, c := range pch {
 		c.ProcessMouse(wu)
 	}
 }

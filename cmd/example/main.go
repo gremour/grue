@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/gremour/grue"
@@ -94,12 +95,52 @@ func runUI() {
 	polish(bt2.Panel)
 
 	bt1.OnPress = func() {
-		btPop := grue.NewPushButton(s.Root(), grue.Base{
-			Rect: grue.R0(120, 40).Moved(s.MousePos()),
-			Text: "Pop",
-		})
-		polish(btPop.Panel)
-		s.PopUp(btPop)
+		grue.NewPopupMenu(s.Root(),
+			//			grue.Base{Rect: grue.R0(200, 44).Moved(s.MousePos())},
+			grue.Base{Rect: grue.R0(200, 44).Moved(grue.V(120, 300))},
+			grue.MenuOption{
+				ID:    "1",
+				Text:  "Press me",
+				Image: "grue-logo20",
+				Handler: func(pm *grue.PopupMenu) bool {
+					bt := pm.GetButton("1")
+					if bt == nil {
+						return false
+					}
+					bt.Text = "Nice"
+					// Keep popup menu after handling press.
+					return false
+				},
+			},
+			grue.MenuOption{
+				Text:     "Disabled",
+				Image:    "grue-logo20",
+				Disabled: true,
+			},
+			grue.MenuOption{
+				Text:  "Final",
+				Image: "grue-logo20",
+				Handler: func(pm *grue.PopupMenu) bool {
+					fmt.Println("Final pressed")
+					// Close popup menu after handling press.
+					return true
+				},
+			},
+			grue.MenuOption{
+				Text:  "Nested",
+				Image: "grue-logo20",
+				Handler: func(pm *grue.PopupMenu) bool {
+					grue.NewPopupMenu(s.Root(),
+						grue.Base{Rect: grue.R0(200, 44).Moved(s.MousePos())},
+						grue.MenuOption{
+							Text: "Lone",
+						},
+					)
+					// Keep popup menu after handling press.
+					return false
+				},
+			},
+		)
 	}
 
 	s.SetEvents(func() {
